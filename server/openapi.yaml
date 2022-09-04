@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: CodeBattle API
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /contests:
+    get:
+      operationId: getContests
+      tags: [contests]
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    name:
+                      type: string
+  /contests/{contestId}:
+    get:
+      operationId: getContestById
+      tags: [contests]
+      parameters:
+        - name: contestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contest'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required: [ id, name ]
+    Contest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          $ref: '#/components/schemas/User'
+        name:
+          type: string
+        description:
+          type: string
+        recentMatches:
+          type: array
+          items:
+            $ref: '#/components/schemas/Match'
+        ranking:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicEntry'
+      required: [ id, owner, name ]
+    Match:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchEntry'
+      required: [ id, entries ]
+    MatchEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PublicEntry'
+        - properties:
+            rank:
+              type: integer
+            beforeScore:
+              type: integer
+            afterScore:
+              type: integer
+      required: [ beforeScore ]
+    PublicEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        score:
+          type: integer
+      required: [ id, name, user, score ]
+    PrivateEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PublicEntry'
+        - properties:
+            repository:
+              type: string
+              format: url
+            status:
+              type: string
+              enum:
+                - processing
+                - registered
+                - error
+            error:
+              type: string
+          required: [repository, status ]
