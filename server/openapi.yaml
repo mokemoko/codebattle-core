@@ -52,6 +52,7 @@ components:
           format: uuid
         name:
           type: string
+          example: tester
       required: [ id, name ]
     Contest:
       type: object
@@ -63,6 +64,7 @@ components:
           $ref: '#/components/schemas/User'
         name:
           type: string
+          example: Sample Game
         description:
           type: string
         recentMatches:
@@ -108,6 +110,7 @@ components:
           format: uuid
         name:
           type: string
+          example: bot example
         user:
           $ref: '#/components/schemas/User'
         score:
