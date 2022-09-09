@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Table } from 'sveltestrap'
-  import type { PublicEntry } from '../generated'
+  import type { PublicEntry } from '../../generated'
 
   export let entries: PublicEntry[]
 </script>

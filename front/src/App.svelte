@@ -1,10 +1,11 @@
 <script lang="ts">
   import { Container, Row, Col } from 'sveltestrap'
-  import { ContestsApi, Configuration, Contest } from './generated'
+  import { ContestsApi, Configuration, Contest } from '../generated'
   import LeaderBoard from './components/LeaderBoard.svelte'
   import Status from './components/Status.svelte'
   import Pickup from './components/Pickup.svelte'
   import History from './components/History.svelte'
+  import Navigation from './components/Navigation.svelte'
 
   async function fetchData(): Promise<Contest> {
     const client = new ContestsApi(new Configuration({
@@ -17,6 +18,7 @@
   const promise = fetchData()
 </script>
 
+<Navigation/>
 {#await promise}
   <div class="d-flex justify-content-center align-items-center" style="height: 100%">
     <div class="spinner-border" role="status"></div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import type {Match} from '../generated'
+  import type {Match} from '../../generated'
 
   export let match: Match
   export let showDetail = true
