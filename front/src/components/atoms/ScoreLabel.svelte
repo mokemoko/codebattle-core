@@ -1,7 +1,7 @@
 <script lang="ts">
 
   export let score: number
-  export let delta: number | null
+  export let delta: number | null = null
 
   const colorMap: [number, string][] = [
     [1000, '#000'],

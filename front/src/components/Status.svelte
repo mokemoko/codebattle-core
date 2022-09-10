@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Badge, Button, Table } from 'sveltestrap'
-  import type { User } from '../../generated'
+  import type { User } from '../generated'
 
   export let user: User
 </script>

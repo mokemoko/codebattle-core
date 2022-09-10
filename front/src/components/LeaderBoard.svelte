@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Table } from 'sveltestrap'
-  import type { PublicEntry } from '../../generated'
-  import ScoreLabel from "./Atoms/ScoreLabel.svelte";
+  import type { PublicEntry } from '../generated'
+  import ScoreLabel from "./atoms/ScoreLabel.svelte";
 
   export let entries: PublicEntry[]
 </script>

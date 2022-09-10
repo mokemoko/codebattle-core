@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Container, Row, Col } from 'sveltestrap'
-  import { ContestsApi, Configuration, Contest } from '../generated'
+  import { ContestsApi, Configuration, Contest } from './generated'
   import LeaderBoard from './components/LeaderBoard.svelte'
   import Status from './components/Status.svelte'
   import Pickup from './components/Pickup.svelte'
@@ -30,11 +30,11 @@
     </Row>
     <Row>
       <Col xs="8">
-        <Pickup/>
+        <Pickup match={contest.recentMatches[0]}/>
         <LeaderBoard entries={contest.ranking}/>
       </Col>
       <Col xs="4">
-        <Status/>
+        <Status user={null}/>
         <History matches={contest.recentMatches}/>
       </Col>
     </Row>

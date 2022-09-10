@@ -1,8 +1,9 @@
 <script lang="ts">
   import { Button, Card, Col, Container, Row, Table } from 'sveltestrap'
   import dayjs from 'dayjs'
-  import type { Match } from '../../generated'
-  import ScoreLabel from './Atoms/ScoreLabel.svelte'
+  import type { Match } from '../generated'
+  import ScoreLabel from './atoms/ScoreLabel.svelte'
+  import RankLabel from './atoms/RankLabel.svelte'
 
   export let matches: Match[]
 </script>
@@ -18,14 +19,15 @@
       <Container>
         <Row>
           <Col xs="2">Time</Col>
-          <Col>{dayjs(match.createdAt).format()}</Col>
+          <Col>{dayjs(match.createdAt).format('YYYY/MM/DD HH:mm:ss')}</Col>
         </Row>
         <Row>
           <Col xs="2">Result</Col>
           <Col>
             {#each match.entries as entry, index}
               <div class="d-flex">
-                <span class="flex-grow-1">{entry.rank} {entry.name}</span>
+                <RankLabel rank={entry.rank}/>
+                <span class="flex-grow-1 mx-2">{entry.name}</span>
                 <ScoreLabel score={entry.afterScore} delta={entry.afterScore - entry.beforeScore}/>
               </div>
             {/each}
