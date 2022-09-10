@@ -19,19 +19,25 @@
 
   function switchAuto() {
     if (timer) {
-      clearInterval(timer)
-      timer = null
+      stop()
     } else {
       timer = setInterval(() => {
         turn += 1
+        if (turn >= game?.turnMax) {
+          stop()
+        }
       }, 100)
     }
   }
 
+  function stop() {
+    clearInterval(timer)
+    timer = null
+  }
+
   function step(delta: number) {
     if (timer) {
-      clearInterval(timer)
-      timer = null
+      stop()
     }
     turn += delta
   }
@@ -60,7 +66,7 @@
     <Button outline color="primary" class="py-1 px-2" on:click={() => step(-1)} disabled={turn <= 0}>
       <Icon class="sm-icon" name="chevron-left"/>
     </Button>
-    <Button outline color="primary" class="p-1" on:click={switchAuto}>
+    <Button outline color="primary" class="p-1" on:click={switchAuto} disabled={turn >= game?.turnMax}>
       {#if timer}
         <Icon class="md-icon" name="pause-fill"/>
       {:else}
