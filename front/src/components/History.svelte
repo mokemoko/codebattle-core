@@ -2,6 +2,7 @@
   import { Button, Card, Col, Container, Row, Table } from 'sveltestrap'
   import dayjs from 'dayjs'
   import type { Match } from '../../generated'
+  import ScoreLabel from './Atoms/ScoreLabel.svelte'
 
   export let matches: Match[]
 </script>
@@ -16,18 +17,22 @@
     <Card>
       <Container>
         <Row>
-          <Col xs="3">Time</Col>
+          <Col xs="2">Time</Col>
           <Col>{dayjs(match.createdAt).format()}</Col>
         </Row>
         <Row>
-          <Col xs="3">Result</Col>
+          <Col xs="2">Result</Col>
           <Col>
             {#each match.entries as entry, index}
-              <div>{entry.rank} {entry.name} {entry.afterScore} {entry.afterScore - entry.beforeScore}</div>
+              <div class="d-flex">
+                <span class="flex-grow-1">{entry.rank} {entry.name}</span>
+                <ScoreLabel score={entry.afterScore} delta={entry.afterScore - entry.beforeScore}/>
+              </div>
             {/each}
           </Col>
         </Row>
       </Container>
+      <a href="#{match.id}" class="stretched-link"></a>
     </Card>
   </div>
 {/each}
@@ -37,7 +42,13 @@
     display: flex;
     justify-content: space-between;
   }
+
   .body {
     margin-bottom: 8px;
+  }
+
+  .body :global(.container) {
+    padding-right: 0.5em;
+    padding-left: 0.5em;
   }
 </style>

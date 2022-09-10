@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Table } from 'sveltestrap'
   import type { PublicEntry } from '../../generated'
+  import ScoreLabel from "./Atoms/ScoreLabel.svelte";
 
   export let entries: PublicEntry[]
 </script>
@@ -21,7 +22,7 @@
       <th scope="row">{i + 1}</th>
       <td>{entry.name}</td>
       <td>{entry.user.name}</td>
-      <td>{entry.score}</td>
+      <td><ScoreLabel score={entry.score} /></td>
     </tr>
   {/each}
   </tbody>
