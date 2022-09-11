@@ -29,6 +29,8 @@ type Match struct {
 	Rank        int64  `boil:"rank" json:"rank" toml:"rank" yaml:"rank"`
 	BeforeScore int64  `boil:"before_score" json:"before_score" toml:"before_score" yaml:"before_score"`
 	AfterScore  int64  `boil:"after_score" json:"after_score" toml:"after_score" yaml:"after_score"`
+	CreatedAt   string `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt   string `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *matchR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L matchL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -41,6 +43,8 @@ var MatchColumns = struct {
 	Rank        string
 	BeforeScore string
 	AfterScore  string
+	CreatedAt   string
+	UpdatedAt   string
 }{
 	ID:          "id",
 	EntryID:     "entry_id",
@@ -48,6 +52,8 @@ var MatchColumns = struct {
 	Rank:        "rank",
 	BeforeScore: "before_score",
 	AfterScore:  "after_score",
+	CreatedAt:   "created_at",
+	UpdatedAt:   "updated_at",
 }
 
 var MatchTableColumns = struct {
@@ -57,6 +63,8 @@ var MatchTableColumns = struct {
 	Rank        string
 	BeforeScore string
 	AfterScore  string
+	CreatedAt   string
+	UpdatedAt   string
 }{
 	ID:          "match.id",
 	EntryID:     "match.entry_id",
@@ -64,6 +72,8 @@ var MatchTableColumns = struct {
 	Rank:        "match.rank",
 	BeforeScore: "match.before_score",
 	AfterScore:  "match.after_score",
+	CreatedAt:   "match.created_at",
+	UpdatedAt:   "match.updated_at",
 }
 
 // Generated where
@@ -75,6 +85,8 @@ var MatchWhere = struct {
 	Rank        whereHelperint64
 	BeforeScore whereHelperint64
 	AfterScore  whereHelperint64
+	CreatedAt   whereHelperstring
+	UpdatedAt   whereHelperstring
 }{
 	ID:          whereHelperstring{field: "\"match\".\"id\""},
 	EntryID:     whereHelperstring{field: "\"match\".\"entry_id\""},
@@ -82,6 +94,8 @@ var MatchWhere = struct {
 	Rank:        whereHelperint64{field: "\"match\".\"rank\""},
 	BeforeScore: whereHelperint64{field: "\"match\".\"before_score\""},
 	AfterScore:  whereHelperint64{field: "\"match\".\"after_score\""},
+	CreatedAt:   whereHelperstring{field: "\"match\".\"created_at\""},
+	UpdatedAt:   whereHelperstring{field: "\"match\".\"updated_at\""},
 }
 
 // MatchRels is where relationship names are stored.
@@ -122,10 +136,10 @@ func (r *matchR) GetEntry() *Entry {
 type matchL struct{}
 
 var (
-	matchAllColumns            = []string{"id", "entry_id", "contest_id", "rank", "before_score", "after_score"}
-	matchColumnsWithoutDefault = []string{"id", "entry_id", "contest_id", "rank", "before_score", "after_score"}
+	matchAllColumns            = []string{"id", "entry_id", "contest_id", "rank", "before_score", "after_score", "created_at", "updated_at"}
+	matchColumnsWithoutDefault = []string{"id", "entry_id", "contest_id", "rank", "before_score", "after_score", "created_at", "updated_at"}
 	matchColumnsWithDefault    = []string{}
-	matchPrimaryKeyColumns     = []string{"id"}
+	matchPrimaryKeyColumns     = []string{"id", "entry_id"}
 	matchGeneratedColumns      = []string{}
 )
 
@@ -713,7 +727,7 @@ func (o *Match) SetContest(ctx context.Context, exec boil.ContextExecutor, inser
 		strmangle.SetParamNames("\"", "\"", 0, []string{"contest_id"}),
 		strmangle.WhereClause("\"", "\"", 0, matchPrimaryKeyColumns),
 	)
-	values := []interface{}{related.ID, o.ID}
+	values := []interface{}{related.ID, o.ID, o.EntryID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -768,7 +782,7 @@ func (o *Match) SetEntry(ctx context.Context, exec boil.ContextExecutor, insert 
 		strmangle.SetParamNames("\"", "\"", 0, []string{"entry_id"}),
 		strmangle.WhereClause("\"", "\"", 0, matchPrimaryKeyColumns),
 	)
-	values := []interface{}{related.ID, o.ID}
+	values := []interface{}{related.ID, o.ID, o.EntryID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -811,13 +825,13 @@ func Matches(mods ...qm.QueryMod) matchQuery {
 }
 
 // FindMatchG retrieves a single record by ID.
-func FindMatchG(ctx context.Context, iD string, selectCols ...string) (*Match, error) {
-	return FindMatch(ctx, boil.GetContextDB(), iD, selectCols...)
+func FindMatchG(ctx context.Context, iD string, entryID string, selectCols ...string) (*Match, error) {
+	return FindMatch(ctx, boil.GetContextDB(), iD, entryID, selectCols...)
 }
 
 // FindMatch retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindMatch(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*Match, error) {
+func FindMatch(ctx context.Context, exec boil.ContextExecutor, iD string, entryID string, selectCols ...string) (*Match, error) {
 	matchObj := &Match{}
 
 	sel := "*"
@@ -825,10 +839,10 @@ func FindMatch(ctx context.Context, exec boil.ContextExecutor, iD string, select
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"match\" where \"id\"=?", sel,
+		"select %s from \"match\" where \"id\"=? AND \"entry_id\"=?", sel,
 	)
 
-	q := queries.Raw(query, iD)
+	q := queries.Raw(query, iD, entryID)
 
 	err := q.Bind(ctx, exec, matchObj)
 	if err != nil {
@@ -953,10 +967,6 @@ func (o *Match) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 			matchAllColumns,
 			matchPrimaryKeyColumns,
 		)
-
-		if !columns.IsWhitelist() {
-			wl = strmangle.SetComplement(wl, []string{"created_at"})
-		}
 		if len(wl) == 0 {
 			return 0, errors.New("models: unable to update match, could not build whitelist")
 		}
@@ -1211,7 +1221,7 @@ func (o *Match) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, e
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), matchPrimaryKeyMapping)
-	sql := "DELETE FROM \"match\" WHERE \"id\"=?"
+	sql := "DELETE FROM \"match\" WHERE \"id\"=? AND \"entry_id\"=?"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1326,7 +1336,7 @@ func (o *Match) ReloadG(ctx context.Context) error {
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Match) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindMatch(ctx, exec, o.ID)
+	ret, err := FindMatch(ctx, exec, o.ID, o.EntryID)
 	if err != nil {
 		return err
 	}
@@ -1375,21 +1385,21 @@ func (o *MatchSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) e
 }
 
 // MatchExistsG checks if the Match row exists.
-func MatchExistsG(ctx context.Context, iD string) (bool, error) {
-	return MatchExists(ctx, boil.GetContextDB(), iD)
+func MatchExistsG(ctx context.Context, iD string, entryID string) (bool, error) {
+	return MatchExists(ctx, boil.GetContextDB(), iD, entryID)
 }
 
 // MatchExists checks if the Match row exists.
-func MatchExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
+func MatchExists(ctx context.Context, exec boil.ContextExecutor, iD string, entryID string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"match\" where \"id\"=? limit 1)"
+	sql := "select exists(select 1 from \"match\" where \"id\"=? AND \"entry_id\"=? limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, iD)
+		fmt.Fprintln(writer, iD, entryID)
 	}
-	row := exec.QueryRowContext(ctx, sql, iD)
+	row := exec.QueryRowContext(ctx, sql, iD, entryID)
 
 	err := row.Scan(&exists)
 	if err != nil {

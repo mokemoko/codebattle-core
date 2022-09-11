@@ -1,6 +1,8 @@
 no-tests = true
 add-enum-types = true
 add-global-variants = true
+# TODO: to enable after change datastore
+no-auto-timestamps = true
 
 [sqlite3]
 dbname = "db.sqlite3"

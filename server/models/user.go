@@ -23,44 +23,65 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID      string `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name    string `boil:"name" json:"name" toml:"name" yaml:"name"`
-	IsAdmin string `boil:"is_admin" json:"is_admin" toml:"is_admin" yaml:"is_admin"`
+	ID        string `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name      string `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Icon      string `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
+	IsAdmin   string `boil:"is_admin" json:"is_admin" toml:"is_admin" yaml:"is_admin"`
+	CreatedAt string `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt string `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserColumns = struct {
-	ID      string
-	Name    string
-	IsAdmin string
+	ID        string
+	Name      string
+	Icon      string
+	IsAdmin   string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:      "id",
-	Name:    "name",
-	IsAdmin: "is_admin",
+	ID:        "id",
+	Name:      "name",
+	Icon:      "icon",
+	IsAdmin:   "is_admin",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var UserTableColumns = struct {
-	ID      string
-	Name    string
-	IsAdmin string
+	ID        string
+	Name      string
+	Icon      string
+	IsAdmin   string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:      "user.id",
-	Name:    "user.name",
-	IsAdmin: "user.is_admin",
+	ID:        "user.id",
+	Name:      "user.name",
+	Icon:      "user.icon",
+	IsAdmin:   "user.is_admin",
+	CreatedAt: "user.created_at",
+	UpdatedAt: "user.updated_at",
 }
 
 // Generated where
 
 var UserWhere = struct {
-	ID      whereHelperstring
-	Name    whereHelperstring
-	IsAdmin whereHelperstring
+	ID        whereHelperstring
+	Name      whereHelperstring
+	Icon      whereHelperstring
+	IsAdmin   whereHelperstring
+	CreatedAt whereHelperstring
+	UpdatedAt whereHelperstring
 }{
-	ID:      whereHelperstring{field: "\"user\".\"id\""},
-	Name:    whereHelperstring{field: "\"user\".\"name\""},
-	IsAdmin: whereHelperstring{field: "\"user\".\"is_admin\""},
+	ID:        whereHelperstring{field: "\"user\".\"id\""},
+	Name:      whereHelperstring{field: "\"user\".\"name\""},
+	Icon:      whereHelperstring{field: "\"user\".\"icon\""},
+	IsAdmin:   whereHelperstring{field: "\"user\".\"is_admin\""},
+	CreatedAt: whereHelperstring{field: "\"user\".\"created_at\""},
+	UpdatedAt: whereHelperstring{field: "\"user\".\"updated_at\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -101,8 +122,8 @@ func (r *userR) GetEntries() EntrySlice {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "name", "is_admin"}
-	userColumnsWithoutDefault = []string{"id", "name"}
+	userAllColumns            = []string{"id", "name", "icon", "is_admin", "created_at", "updated_at"}
+	userColumnsWithoutDefault = []string{"id", "name", "icon", "created_at", "updated_at"}
 	userColumnsWithDefault    = []string{"is_admin"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
@@ -940,10 +961,6 @@ func (o *User) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 			userAllColumns,
 			userPrimaryKeyColumns,
 		)
-
-		if !columns.IsWhitelist() {
-			wl = strmangle.SetComplement(wl, []string{"created_at"})
-		}
 		if len(wl) == 0 {
 			return 0, errors.New("models: unable to update user, could not build whitelist")
 		}

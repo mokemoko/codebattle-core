@@ -31,6 +31,9 @@ type Entry struct {
 	Repository string      `boil:"repository" json:"repository" toml:"repository" yaml:"repository"`
 	Status     int64       `boil:"status" json:"status" toml:"status" yaml:"status"`
 	Error      null.String `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
+	Score      int64       `boil:"score" json:"score" toml:"score" yaml:"score"`
+	CreatedAt  string      `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt  string      `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *entryR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L entryL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -44,6 +47,9 @@ var EntryColumns = struct {
 	Repository string
 	Status     string
 	Error      string
+	Score      string
+	CreatedAt  string
+	UpdatedAt  string
 }{
 	ID:         "id",
 	UserID:     "user_id",
@@ -52,6 +58,9 @@ var EntryColumns = struct {
 	Repository: "repository",
 	Status:     "status",
 	Error:      "error",
+	Score:      "score",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
 }
 
 var EntryTableColumns = struct {
@@ -62,6 +71,9 @@ var EntryTableColumns = struct {
 	Repository string
 	Status     string
 	Error      string
+	Score      string
+	CreatedAt  string
+	UpdatedAt  string
 }{
 	ID:         "entry.id",
 	UserID:     "entry.user_id",
@@ -70,6 +82,9 @@ var EntryTableColumns = struct {
 	Repository: "entry.repository",
 	Status:     "entry.status",
 	Error:      "entry.error",
+	Score:      "entry.score",
+	CreatedAt:  "entry.created_at",
+	UpdatedAt:  "entry.updated_at",
 }
 
 // Generated where
@@ -105,6 +120,9 @@ var EntryWhere = struct {
 	Repository whereHelperstring
 	Status     whereHelperint64
 	Error      whereHelpernull_String
+	Score      whereHelperint64
+	CreatedAt  whereHelperstring
+	UpdatedAt  whereHelperstring
 }{
 	ID:         whereHelperstring{field: "\"entry\".\"id\""},
 	UserID:     whereHelperstring{field: "\"entry\".\"user_id\""},
@@ -113,6 +131,9 @@ var EntryWhere = struct {
 	Repository: whereHelperstring{field: "\"entry\".\"repository\""},
 	Status:     whereHelperint64{field: "\"entry\".\"status\""},
 	Error:      whereHelpernull_String{field: "\"entry\".\"error\""},
+	Score:      whereHelperint64{field: "\"entry\".\"score\""},
+	CreatedAt:  whereHelperstring{field: "\"entry\".\"created_at\""},
+	UpdatedAt:  whereHelperstring{field: "\"entry\".\"updated_at\""},
 }
 
 // EntryRels is where relationship names are stored.
@@ -163,8 +184,8 @@ func (r *entryR) GetMatches() MatchSlice {
 type entryL struct{}
 
 var (
-	entryAllColumns            = []string{"id", "user_id", "contest_id", "name", "repository", "status", "error"}
-	entryColumnsWithoutDefault = []string{"id", "user_id", "contest_id", "name", "repository", "status"}
+	entryAllColumns            = []string{"id", "user_id", "contest_id", "name", "repository", "status", "error", "score", "created_at", "updated_at"}
+	entryColumnsWithoutDefault = []string{"id", "user_id", "contest_id", "name", "repository", "status", "score", "created_at", "updated_at"}
 	entryColumnsWithDefault    = []string{"error"}
 	entryPrimaryKeyColumns     = []string{"id"}
 	entryGeneratedColumns      = []string{}
@@ -995,7 +1016,7 @@ func (o *Entry) AddMatches(ctx context.Context, exec boil.ContextExecutor, inser
 				strmangle.SetParamNames("\"", "\"", 0, []string{"entry_id"}),
 				strmangle.WhereClause("\"", "\"", 0, matchPrimaryKeyColumns),
 			)
-			values := []interface{}{o.ID, rel.ID}
+			values := []interface{}{o.ID, rel.ID, rel.EntryID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -1184,10 +1205,6 @@ func (o *Entry) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 			entryAllColumns,
 			entryPrimaryKeyColumns,
 		)
-
-		if !columns.IsWhitelist() {
-			wl = strmangle.SetComplement(wl, []string{"created_at"})
-		}
 		if len(wl) == 0 {
 			return 0, errors.New("models: unable to update entry, could not build whitelist")
 		}

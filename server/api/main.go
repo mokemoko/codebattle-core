@@ -11,6 +11,8 @@ package main
 
 import (
 	"database/sql"
+	"flag"
+	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,23 +21,40 @@ import (
 	sw "codebattle/server/api/go"
 )
 
-func setupDatabase() error {
+type Args struct {
+	Port    string
+	IsDebug bool
+}
+
+func parseArgs() Args {
+	args := Args{}
+	flag.StringVar(&args.Port, "port", "8080", "")
+	flag.BoolVar(&args.IsDebug, "debug", false, "")
+	flag.Parse()
+	return args
+}
+
+func setupDatabase(args Args) error {
 	db, err := sql.Open("sqlite3", "../sql/db.sqlite3")
 	if err != nil {
 		return err
 	}
-	boil.DebugMode = true
+	if args.IsDebug {
+		boil.DebugMode = true
+	}
 	boil.SetDB(db)
 	return nil
 }
 
 func main() {
-	if err := setupDatabase(); err != nil {
+	args := parseArgs()
+
+	if err := setupDatabase(args); err != nil {
 		log.Fatal(err)
 	}
 
 	router := sw.NewRouter()
 
 	log.Printf("Server started")
-	log.Fatal(router.Run(":8080"))
+	log.Fatal(router.Run(fmt.Sprintf(":%s", args.Port)))
 }

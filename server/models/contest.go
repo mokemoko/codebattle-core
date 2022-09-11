@@ -29,6 +29,8 @@ type Contest struct {
 	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
 	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
 	Repository  string      `boil:"repository" json:"repository" toml:"repository" yaml:"repository"`
+	CreatedAt   string      `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt   string      `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *contestR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L contestL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -40,12 +42,16 @@ var ContestColumns = struct {
 	Name        string
 	Description string
 	Repository  string
+	CreatedAt   string
+	UpdatedAt   string
 }{
 	ID:          "id",
 	Owner:       "owner",
 	Name:        "name",
 	Description: "description",
 	Repository:  "repository",
+	CreatedAt:   "created_at",
+	UpdatedAt:   "updated_at",
 }
 
 var ContestTableColumns = struct {
@@ -54,12 +60,16 @@ var ContestTableColumns = struct {
 	Name        string
 	Description string
 	Repository  string
+	CreatedAt   string
+	UpdatedAt   string
 }{
 	ID:          "contest.id",
 	Owner:       "contest.owner",
 	Name:        "contest.name",
 	Description: "contest.description",
 	Repository:  "contest.repository",
+	CreatedAt:   "contest.created_at",
+	UpdatedAt:   "contest.updated_at",
 }
 
 // Generated where
@@ -131,12 +141,16 @@ var ContestWhere = struct {
 	Name        whereHelperstring
 	Description whereHelpernull_String
 	Repository  whereHelperstring
+	CreatedAt   whereHelperstring
+	UpdatedAt   whereHelperstring
 }{
 	ID:          whereHelperstring{field: "\"contest\".\"id\""},
 	Owner:       whereHelperstring{field: "\"contest\".\"owner\""},
 	Name:        whereHelperstring{field: "\"contest\".\"name\""},
 	Description: whereHelpernull_String{field: "\"contest\".\"description\""},
 	Repository:  whereHelperstring{field: "\"contest\".\"repository\""},
+	CreatedAt:   whereHelperstring{field: "\"contest\".\"created_at\""},
+	UpdatedAt:   whereHelperstring{field: "\"contest\".\"updated_at\""},
 }
 
 // ContestRels is where relationship names are stored.
@@ -187,8 +201,8 @@ func (r *contestR) GetMatches() MatchSlice {
 type contestL struct{}
 
 var (
-	contestAllColumns            = []string{"id", "owner", "name", "description", "repository"}
-	contestColumnsWithoutDefault = []string{"id", "owner", "name", "repository"}
+	contestAllColumns            = []string{"id", "owner", "name", "description", "repository", "created_at", "updated_at"}
+	contestColumnsWithoutDefault = []string{"id", "owner", "name", "repository", "created_at", "updated_at"}
 	contestColumnsWithDefault    = []string{"description"}
 	contestPrimaryKeyColumns     = []string{"id"}
 	contestGeneratedColumns      = []string{}
@@ -1023,7 +1037,7 @@ func (o *Contest) AddMatches(ctx context.Context, exec boil.ContextExecutor, ins
 				strmangle.SetParamNames("\"", "\"", 0, []string{"contest_id"}),
 				strmangle.WhereClause("\"", "\"", 0, matchPrimaryKeyColumns),
 			)
-			values := []interface{}{o.ID, rel.ID}
+			values := []interface{}{o.ID, rel.ID, rel.EntryID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -1212,10 +1226,6 @@ func (o *Contest) Update(ctx context.Context, exec boil.ContextExecutor, columns
 			contestAllColumns,
 			contestPrimaryKeyColumns,
 		)
-
-		if !columns.IsWhitelist() {
-			wl = strmangle.SetComplement(wl, []string{"created_at"})
-		}
 		if len(wl) == 0 {
 			return 0, errors.New("models: unable to update contest, could not build whitelist")
 		}
