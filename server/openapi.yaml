@@ -24,6 +24,7 @@ paths:
                       format: uuid
                     name:
                       type: string
+                  required: [id, name]
   /contests/{contestId}:
     get:
       operationId: getContestById

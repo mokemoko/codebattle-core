@@ -1,0 +1,6 @@
+no-tests = true
+add-enum-types = true
+add-global-variants = true
+
+[sqlite3]
+dbname = "db.sqlite3"

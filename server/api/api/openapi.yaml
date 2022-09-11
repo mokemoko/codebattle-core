@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: CodeBattle API
+  version: 1.0.0
+servers:
+- url: https
+paths:
+  /contests:
+    get:
+      operationId: getContests
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/getContests_200_response_inner'
+                type: array
+          description: ok
+      tags:
+      - contests
+  /contests/{contestId}:
+    get:
+      operationId: getContestById
+      parameters:
+      - explode: false
+        in: path
+        name: contestId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contest'
+          description: ok
+      tags:
+      - contests
+components:
+  schemas:
+    User:
+      example:
+        name: tester
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          example: tester
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    Contest:
+      example:
+        owner:
+          name: tester
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        name: Sample Game
+        description: description
+        recentMatches:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          entries:
+          - null
+          - null
+          - null
+          - null
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          entries:
+          - null
+          - null
+          - null
+          - null
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        ranking:
+        - score: 800
+          name: bot example
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          user:
+            name: tester
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - score: 800
+          name: bot example
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          user:
+            name: tester
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        owner:
+          $ref: '#/components/schemas/User'
+        name:
+          example: Sample Game
+          type: string
+        description:
+          type: string
+        recentMatches:
+          items:
+            $ref: '#/components/schemas/Match'
+          type: array
+        ranking:
+          items:
+            $ref: '#/components/schemas/PublicEntry'
+          type: array
+      required:
+      - id
+      - name
+      - owner
+      type: object
+    Match:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        entries:
+        - null
+        - null
+        - null
+        - null
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        entries:
+          items:
+            $ref: '#/components/schemas/MatchEntry'
+          maxItems: 4
+          minItems: 2
+          type: array
+      required:
+      - entries
+      - id
+      type: object
+    MatchEntry:
+      allOf:
+      - $ref: '#/components/schemas/PublicEntry'
+      - $ref: '#/components/schemas/MatchEntry_allOf'
+      required:
+      - beforeScore
+      type: object
+    PublicEntry:
+      example:
+        score: 800
+        name: bot example
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        user:
+          name: tester
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          example: bot example
+          maxLength: 20
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        score:
+          maximum: 9999
+          minimum: 0
+          type: integer
+      required:
+      - id
+      - name
+      - score
+      - user
+      type: object
+    PrivateEntry:
+      allOf:
+      - $ref: '#/components/schemas/PublicEntry'
+      - $ref: '#/components/schemas/PrivateEntry_allOf'
+      type: object
+    getContests_200_response_inner:
+      example:
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+      type: object
+    MatchEntry_allOf:
+      properties:
+        rank:
+          maximum: 4
+          minimum: 1
+          type: integer
+        beforeScore:
+          maximum: 9999
+          minimum: 0
+          type: integer
+        afterScore:
+          maximum: 9999
+          minimum: 0
+          type: integer
+    PrivateEntry_allOf:
+      properties:
+        repository:
+          format: url
+          type: string
+        status:
+          enum:
+          - processing
+          - registered
+          - error
+          type: string
+        error:
+          type: string
+      required:
+      - repository
+      - status
