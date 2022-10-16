@@ -28,7 +28,7 @@ type Args struct {
 
 func parseArgs() Args {
 	args := Args{}
-	flag.StringVar(&args.Port, "port", "8080", "")
+	flag.StringVar(&args.Port, "port", "8081", "")
 	flag.BoolVar(&args.IsDebug, "debug", false, "")
 	flag.Parse()
 	return args

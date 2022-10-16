@@ -19,6 +19,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.10
 	github.com/mokemoko/codebattle-core/server/models v0.1.0
+	gonum.org/v1/gonum v0.12.0
 )
 
 replace github.com/mokemoko/codebattle-core/server/models => ../models
