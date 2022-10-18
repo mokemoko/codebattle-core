@@ -3,11 +3,16 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/google/uuid"
+	"io/ioutil"
 	"log"
 	"math"
 	"math/rand"
+	"os/exec"
+	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -20,6 +25,22 @@ import (
 type Args struct {
 	ContestId string
 	IsDebug   bool
+}
+
+type MatchInfo struct {
+	Contest      *models.Contest
+	MatchEntries []*models.Match
+	Entries      []*models.Entry
+}
+
+type ExecuteParams struct {
+	Images []string    `json:"images"`
+	Meta   interface{} `json:"meta,omitempty"`
+}
+
+type ExecuteResult struct {
+	Status int `json:"status"`
+	Rank   []int
 }
 
 type Result struct {
@@ -46,7 +67,15 @@ func setupDatabase(args Args) error {
 	return nil
 }
 
-func makeMatch(contestId string) ([]*models.Match, error) {
+func makeMatch(contestId string) (*MatchInfo, error) {
+	matchInfo := MatchInfo{}
+
+	contest, err := models.FindContestG(context.Background(), contestId)
+	if err != nil {
+		return nil, err
+	}
+	matchInfo.Contest = contest
+
 	entries, err := models.Entries(
 		models.EntryWhere.ContestID.EQ(contestId),
 		OrderBy("RANDOM()"),
@@ -58,7 +87,6 @@ func makeMatch(contestId string) ([]*models.Match, error) {
 
 	matchId := uuid.NewString()
 	ts := time.Now().UTC().Format("2006-01-02T15:04:05Z")
-	var matchEntries []*models.Match
 
 	tx, err := boil.GetDB().(*sql.DB).Begin()
 	if err != nil {
@@ -80,23 +108,54 @@ func makeMatch(contestId string) ([]*models.Match, error) {
 			_ = tx.Rollback()
 			return nil, err
 		}
-		matchEntries = append(matchEntries, &matchEntry)
+		matchInfo.MatchEntries = append(matchInfo.MatchEntries, &matchEntry)
+		matchInfo.Entries = append(matchInfo.Entries, entry)
 	}
 	err = tx.Commit()
 	if err != nil {
 		return nil, err
 	}
 
-	return matchEntries, nil
+	return &matchInfo, nil
 }
 
-func executeMatch(matchEntries []*models.Match) (Result, error) {
-	// TODO: replace
-	result := Result{
-		Status: 1,
+func executeMatch(matchInfo *MatchInfo) (ExecuteResult, error) {
+	result := ExecuteResult{
+		Status: -1,
 	}
-	for _, matchEntry := range matchEntries {
-		matchEntry.Rank = int64(rand.Intn(6) - 1)
+	// TODO: Contest.Meta を参照して設定
+	params := ExecuteParams{}
+	for _, entry := range matchInfo.Entries {
+		// TODO: use hash
+		params.Images = append(params.Images, entry.Repository)
+	}
+
+	b, err := json.Marshal(params)
+	if err != nil {
+		return result, err
+	}
+
+	// TODO: replace executor
+	stdout, err := exec.Command("/usr/local/bin/docker", "run", "--rm", "-v", "/var/run/docker.sock:/var/run/docker.sock", "cbe-bomberman", string(b)).Output()
+	if err != nil {
+		return result, err
+	}
+
+	// TODO: put log to s3
+	err = ioutil.WriteFile(fmt.Sprintf("logs/%s.log", matchInfo.MatchEntries[0].ID), stdout, 0644)
+	if err != nil {
+		return result, err
+	}
+
+	// parse match result from last line
+	lines := strings.Split(string(stdout), "\n")
+	err = json.Unmarshal([]byte(lines[len(lines)-2]), &result)
+	if err != nil {
+		return result, err
+	}
+
+	for idx, matchEntry := range matchInfo.MatchEntries {
+		matchEntry.Rank = int64(result.Rank[idx])
 	}
 	return result, nil
 }
@@ -169,19 +228,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	matchEntries, err := makeMatch(args.ContestId)
+	matchInfo, err := makeMatch(args.ContestId)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	result, err := executeMatch(matchEntries)
+	result, err := executeMatch(matchInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	rateMatch(matchEntries)
+	rateMatch(matchInfo.MatchEntries)
 
-	err = saveMatch(matchEntries)
+	err = saveMatch(matchInfo.MatchEntries)
 	if err != nil {
 		log.Fatal(err)
 	}
