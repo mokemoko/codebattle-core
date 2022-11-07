@@ -1,6 +1,7 @@
 package main
 
 import (
+	entry "batch/commands"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -25,6 +26,7 @@ import (
 type Args struct {
 	ContestId string
 	IsDebug   bool
+	Command   string
 }
 
 type MatchInfo struct {
@@ -51,6 +53,7 @@ func parseArgs() Args {
 	args := Args{}
 	flag.BoolVar(&args.IsDebug, "debug", false, "")
 	flag.StringVar(&args.ContestId, "contestId", "", "")
+	flag.StringVar(&args.Command, "command", "execute", "choose in [entry, matchmake, execute]")
 	flag.Parse()
 	return args
 }
@@ -228,22 +231,32 @@ func main() {
 		log.Fatal(err)
 	}
 
-	matchInfo, err := makeMatch(args.ContestId)
-	if err != nil {
-		log.Fatal(err)
+	switch args.Command {
+	case "entry":
+		err := entry.Execute()
+		if err != nil {
+			log.Fatal(err)
+		}
+	case "matchmake":
+		matchInfo, err := makeMatch(args.ContestId)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("%+v", matchInfo)
+	case "execute":
+		// TODO: dequeue match
+		matchInfo, err := makeMatch(args.ContestId)
+		result, err := executeMatch(matchInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rateMatch(matchInfo.MatchEntries)
+		err = saveMatch(matchInfo.MatchEntries)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("%+v", result)
+	default:
+		log.Fatalf("Invalid command: %s", args.Command)
 	}
-
-	result, err := executeMatch(matchInfo)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	rateMatch(matchInfo.MatchEntries)
-
-	err = saveMatch(matchInfo.MatchEntries)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("%+v", result)
 }
