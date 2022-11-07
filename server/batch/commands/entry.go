@@ -72,6 +72,7 @@ func buildImage(entry *models.Entry) error {
 	_, err = c.ImageBuild(context.Background(), buildCtx, types.ImageBuildOptions{
 		Tags:           []string{hash},
 		SuppressOutput: true,
+		Remove:         true,
 		ForceRemove:    true,
 		Dockerfile:     "sample/dummy/Dockerfile",
 	})
