@@ -49,6 +49,7 @@ CREATE TABLE `match`
     id           VARCHAR(36) NOT NULL,
     entry_id     VARCHAR(36) NOT NULL,
     contest_id   VARCHAR(36) NOT NULL,
+    status       INT         NOT NULL DEFAULT 0,
     `rank`       INT         NOT NULL,
     before_score INT         NOT NULL,
     after_score  INT         NOT NULL,

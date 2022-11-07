@@ -26,6 +26,7 @@ type Match struct {
 	ID          string `boil:"id" json:"id" toml:"id" yaml:"id"`
 	EntryID     string `boil:"entry_id" json:"entry_id" toml:"entry_id" yaml:"entry_id"`
 	ContestID   string `boil:"contest_id" json:"contest_id" toml:"contest_id" yaml:"contest_id"`
+	Status      int64  `boil:"status" json:"status" toml:"status" yaml:"status"`
 	Rank        int64  `boil:"rank" json:"rank" toml:"rank" yaml:"rank"`
 	BeforeScore int64  `boil:"before_score" json:"before_score" toml:"before_score" yaml:"before_score"`
 	AfterScore  int64  `boil:"after_score" json:"after_score" toml:"after_score" yaml:"after_score"`
@@ -40,6 +41,7 @@ var MatchColumns = struct {
 	ID          string
 	EntryID     string
 	ContestID   string
+	Status      string
 	Rank        string
 	BeforeScore string
 	AfterScore  string
@@ -49,6 +51,7 @@ var MatchColumns = struct {
 	ID:          "id",
 	EntryID:     "entry_id",
 	ContestID:   "contest_id",
+	Status:      "status",
 	Rank:        "rank",
 	BeforeScore: "before_score",
 	AfterScore:  "after_score",
@@ -60,6 +63,7 @@ var MatchTableColumns = struct {
 	ID          string
 	EntryID     string
 	ContestID   string
+	Status      string
 	Rank        string
 	BeforeScore string
 	AfterScore  string
@@ -69,6 +73,7 @@ var MatchTableColumns = struct {
 	ID:          "match.id",
 	EntryID:     "match.entry_id",
 	ContestID:   "match.contest_id",
+	Status:      "match.status",
 	Rank:        "match.rank",
 	BeforeScore: "match.before_score",
 	AfterScore:  "match.after_score",
@@ -82,6 +87,7 @@ var MatchWhere = struct {
 	ID          whereHelperstring
 	EntryID     whereHelperstring
 	ContestID   whereHelperstring
+	Status      whereHelperint64
 	Rank        whereHelperint64
 	BeforeScore whereHelperint64
 	AfterScore  whereHelperint64
@@ -91,6 +97,7 @@ var MatchWhere = struct {
 	ID:          whereHelperstring{field: "\"match\".\"id\""},
 	EntryID:     whereHelperstring{field: "\"match\".\"entry_id\""},
 	ContestID:   whereHelperstring{field: "\"match\".\"contest_id\""},
+	Status:      whereHelperint64{field: "\"match\".\"status\""},
 	Rank:        whereHelperint64{field: "\"match\".\"rank\""},
 	BeforeScore: whereHelperint64{field: "\"match\".\"before_score\""},
 	AfterScore:  whereHelperint64{field: "\"match\".\"after_score\""},
@@ -136,9 +143,9 @@ func (r *matchR) GetEntry() *Entry {
 type matchL struct{}
 
 var (
-	matchAllColumns            = []string{"id", "entry_id", "contest_id", "rank", "before_score", "after_score", "created_at", "updated_at"}
+	matchAllColumns            = []string{"id", "entry_id", "contest_id", "status", "rank", "before_score", "after_score", "created_at", "updated_at"}
 	matchColumnsWithoutDefault = []string{"id", "entry_id", "contest_id", "rank", "before_score", "after_score", "created_at", "updated_at"}
-	matchColumnsWithDefault    = []string{}
+	matchColumnsWithDefault    = []string{"status"}
 	matchPrimaryKeyColumns     = []string{"id", "entry_id"}
 	matchGeneratedColumns      = []string{}
 )
