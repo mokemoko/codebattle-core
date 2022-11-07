@@ -61,7 +61,7 @@ export class Game {
     bombs.forEach(b => {
       this.ctx.drawImage(mapSprite, 0, IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE,
         b[1] * DRAW_SIZE, b[0] * DRAW_SIZE, DRAW_SIZE, DRAW_SIZE)
-      if (b[4] === turn + 1 && turn + 1 < this.turnMax) {
+      if (b[4] === turn + 1 && turn + 1 <= this.turnMax) {
         const cmap = this.turnInfo[turn].map
         const nmap = this.turnInfo[turn + 1].map
         nmap[b[0]][b[1]] = '*'
