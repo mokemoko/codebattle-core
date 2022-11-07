@@ -5,6 +5,7 @@ CREATE TABLE user
     name       VARCHAR(100) NOT NULL,
     icon       VARCHAR(100) NOT NULL,
     is_admin   BOOL         NOT NULL DEFAULT FALSE,
+    token      VARCHAR(100),
     created_at TIMESTAMP    NOT NULL,
     updated_at TIMESTAMP    NOT NULL,
     PRIMARY KEY (id)

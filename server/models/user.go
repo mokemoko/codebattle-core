@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,12 +24,13 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID        string `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name      string `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Icon      string `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
-	IsAdmin   string `boil:"is_admin" json:"is_admin" toml:"is_admin" yaml:"is_admin"`
-	CreatedAt string `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt string `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID        string      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name      string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Icon      string      `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
+	IsAdmin   string      `boil:"is_admin" json:"is_admin" toml:"is_admin" yaml:"is_admin"`
+	Token     null.String `boil:"token" json:"token,omitempty" toml:"token" yaml:"token,omitempty"`
+	CreatedAt string      `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt string      `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -39,6 +41,7 @@ var UserColumns = struct {
 	Name      string
 	Icon      string
 	IsAdmin   string
+	Token     string
 	CreatedAt string
 	UpdatedAt string
 }{
@@ -46,6 +49,7 @@ var UserColumns = struct {
 	Name:      "name",
 	Icon:      "icon",
 	IsAdmin:   "is_admin",
+	Token:     "token",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 }
@@ -55,6 +59,7 @@ var UserTableColumns = struct {
 	Name      string
 	Icon      string
 	IsAdmin   string
+	Token     string
 	CreatedAt string
 	UpdatedAt string
 }{
@@ -62,6 +67,7 @@ var UserTableColumns = struct {
 	Name:      "user.name",
 	Icon:      "user.icon",
 	IsAdmin:   "user.is_admin",
+	Token:     "user.token",
 	CreatedAt: "user.created_at",
 	UpdatedAt: "user.updated_at",
 }
@@ -73,6 +79,7 @@ var UserWhere = struct {
 	Name      whereHelperstring
 	Icon      whereHelperstring
 	IsAdmin   whereHelperstring
+	Token     whereHelpernull_String
 	CreatedAt whereHelperstring
 	UpdatedAt whereHelperstring
 }{
@@ -80,6 +87,7 @@ var UserWhere = struct {
 	Name:      whereHelperstring{field: "\"user\".\"name\""},
 	Icon:      whereHelperstring{field: "\"user\".\"icon\""},
 	IsAdmin:   whereHelperstring{field: "\"user\".\"is_admin\""},
+	Token:     whereHelpernull_String{field: "\"user\".\"token\""},
 	CreatedAt: whereHelperstring{field: "\"user\".\"created_at\""},
 	UpdatedAt: whereHelperstring{field: "\"user\".\"updated_at\""},
 }
@@ -122,9 +130,9 @@ func (r *userR) GetEntries() EntrySlice {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "name", "icon", "is_admin", "created_at", "updated_at"}
+	userAllColumns            = []string{"id", "name", "icon", "is_admin", "token", "created_at", "updated_at"}
 	userColumnsWithoutDefault = []string{"id", "name", "icon", "created_at", "updated_at"}
-	userColumnsWithDefault    = []string{"is_admin"}
+	userColumnsWithDefault    = []string{"is_admin", "token"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
 )
