@@ -1,4 +1,4 @@
-package entry
+package commands
 
 import (
 	"context"
@@ -18,6 +18,12 @@ import (
 	"os"
 )
 
+func genRepoHash(entry *models.Entry) string {
+	h := sha1.New()
+	h.Write([]byte(entry.Repository))
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
 func getEntry() (*models.Entry, error) {
 	entry, err := models.Entries(
 		models.EntryWhere.Status.EQ(0),
@@ -31,12 +37,6 @@ func getEntry() (*models.Entry, error) {
 		}
 	}
 	return entry, nil
-}
-
-func genRepoHash(entry *models.Entry) string {
-	h := sha1.New()
-	h.Write([]byte(entry.Repository))
-	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func pullRepo(entry *models.Entry) error {
@@ -92,12 +92,12 @@ func applyError(entry *models.Entry, err error) error {
 	return updateEntry(entry)
 }
 
-func Execute() error {
+func RunEntry() {
 	count := 0
 	for {
 		entry, err := getEntry()
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 		if entry == nil {
 			break
@@ -108,7 +108,7 @@ func Execute() error {
 			log.Print(err)
 			err = applyError(entry, err)
 			if err != nil {
-				return err
+				log.Fatal(err)
 			} else {
 				break
 			}
@@ -118,7 +118,7 @@ func Execute() error {
 			log.Print(err)
 			err = applyError(entry, err)
 			if err != nil {
-				return err
+				log.Fatal(err)
 			} else {
 				break
 			}
@@ -126,11 +126,9 @@ func Execute() error {
 		entry.Status = 1
 		err = updateEntry(entry)
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 	}
 
 	log.Printf("Execute %d entries.", count)
-
-	return nil
 }
