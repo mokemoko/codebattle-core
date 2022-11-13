@@ -12,7 +12,6 @@ package openapi
 import (
 	"net/http"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +24,8 @@ type Route struct {
 	// Pattern is the pattern of the URI.
 	Pattern string
 	// HandlerFunc is the handler function of this route.
-	HandlerFunc gin.HandlerFunc
+	HandlerFunc    gin.HandlerFunc
+	isAuthRequired bool
 }
 
 // Routes is the list of the generated Route.
@@ -33,11 +33,17 @@ type Routes []Route
 
 // NewRouter returns a new router.
 func NewRouter() *gin.Engine {
-	router := gin.Default()
+	baseRouter := gin.Default()
 
-	router.Use(cors.Default())
+	unauthorizedRouter, authorizedRouter := customRouter(baseRouter)
 
 	for _, route := range routes {
+		var router *gin.RouterGroup
+		if route.isAuthRequired {
+			router = authorizedRouter
+		} else {
+			router = unauthorizedRouter
+		}
 		switch route.Method {
 		case http.MethodGet:
 			router.GET(route.Pattern, route.HandlerFunc)
@@ -52,7 +58,7 @@ func NewRouter() *gin.Engine {
 		}
 	}
 
-	return router
+	return baseRouter
 }
 
 var routes = Routes{
@@ -61,6 +67,7 @@ var routes = Routes{
 		http.MethodGet,
 		"/contests/:contestId",
 		GetContestById,
+		false,
 	},
 
 	{
@@ -68,6 +75,7 @@ var routes = Routes{
 		http.MethodGet,
 		"/contests",
 		GetContests,
+		false,
 	},
 
 	{
@@ -75,6 +83,7 @@ var routes = Routes{
 		http.MethodPut,
 		"/contests/:contestId/matches",
 		PutMatch,
+		true,
 	},
 
 	{
@@ -82,6 +91,7 @@ var routes = Routes{
 		http.MethodPost,
 		"/entries",
 		PostEntry,
+		true,
 	},
 
 	{
@@ -89,6 +99,7 @@ var routes = Routes{
 		http.MethodPut,
 		"/entries/:entryId",
 		PutEntry,
+		true,
 	},
 
 	{
@@ -96,5 +107,6 @@ var routes = Routes{
 		http.MethodGet,
 		"/users/me",
 		GetMe,
+		true,
 	},
 }

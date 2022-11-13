@@ -14,16 +14,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
-	"os"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-
-	"github.com/markbates/goth"
-	"github.com/markbates/goth/gothic"
-	"github.com/markbates/goth/providers/github"
 
 	sw "codebattle/server/api/go"
 )
@@ -53,32 +46,6 @@ func setupDatabase(args Args) error {
 	return nil
 }
 
-func setupAuth(router *gin.Engine) {
-	gothic.GetProviderName = func(req *http.Request) (string, error) {
-		return "github", nil
-	}
-	goth.UseProviders(github.New(
-		os.Getenv("GITHUB_CLIENT_KEY"),
-		os.Getenv("GITHUB_CLIENT_SECRET"),
-		os.Getenv("GITHUB_CALLBACK_URL"),
-		"repo",
-	))
-
-	router.GET("/login", func(c *gin.Context) {
-		gothic.BeginAuthHandler(c.Writer, c.Request)
-	})
-	router.GET("/callback", func(c *gin.Context) {
-		user, err := gothic.CompleteUserAuth(c.Writer, c.Request)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("%+v", user)
-		c.JSON(http.StatusOK, gin.H{
-			"user": user,
-		})
-	})
-}
-
 func main() {
 	args := parseArgs()
 
@@ -87,9 +54,6 @@ func main() {
 	}
 
 	router := sw.NewRouter()
-
-	// use temporary
-	setupAuth(router)
 
 	log.Printf("Server started")
 	log.Fatal(router.Run(fmt.Sprintf(":%s", args.Port)))

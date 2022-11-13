@@ -12,6 +12,7 @@ require (
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2 // indirect
@@ -41,6 +42,7 @@ require (
 )
 
 require (
+	github.com/appleboy/gin-jwt/v2 v2.9.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/markbates/goth v1.75.1
 	github.com/mattn/go-sqlite3 v1.14.10
