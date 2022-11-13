@@ -5,6 +5,19 @@ info:
 servers:
   - url: 'https'
 paths:
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
   /contests:
     get:
       operationId: getContests
@@ -43,6 +56,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Contest'
+  /contests/{contestId}/matches:
+    put:
+      operationId: putMatch
+      tags: [contests]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: contestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+  /entries:
+    post:
+      operationId: postEntry
+      tags: [entries]
+      security:
+        - cookieAuth: []
+      parameters:
+        -
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateEntry'
+  /entries/{entryId}:
+    put:
+      operationId: putEntry
+      tags: [entries]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateEntry'
 components:
   schemas:
     User:
@@ -145,3 +213,8 @@ components:
             error:
               type: string
           required: [repository, status ]
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JWT

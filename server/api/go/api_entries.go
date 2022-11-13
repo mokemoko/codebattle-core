@@ -9,9 +9,18 @@
 
 package openapi
 
-type GetContests200ResponseInner struct {
+import (
+	"net/http"
 
-	Id string `json:"id"`
+	"github.com/gin-gonic/gin"
+)
 
-	Name string `json:"name"`
+// PostEntry - 
+func PostEntry(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+// PutEntry - 
+func PutEntry(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{})
 }

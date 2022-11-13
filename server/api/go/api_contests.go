@@ -134,3 +134,8 @@ func GetContests(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
+
+// PutMatch -
+func PutMatch(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{})
+}

@@ -5,6 +5,20 @@ info:
 servers:
 - url: https
 paths:
+  /users/me:
+    get:
+      operationId: getMe
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ok
+      security:
+      - cookieAuth: []
+      tags:
+      - users
   /contests:
     get:
       operationId: getContests
@@ -40,6 +54,61 @@ paths:
           description: ok
       tags:
       - contests
+  /contests/{contestId}/matches:
+    put:
+      operationId: putMatch
+      parameters:
+      - explode: false
+        in: path
+        name: contestId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+          description: ok
+      tags:
+      - contests
+  /entries:
+    post:
+      operationId: postEntry
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateEntry'
+          description: ok
+      tags:
+      - entries
+  /entries/{entryId}:
+    put:
+      operationId: putEntry
+      parameters:
+      - explode: false
+        in: path
+        name: entryId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateEntry'
+          description: ok
+      tags:
+      - entries
 components:
   schemas:
     User:
@@ -193,6 +262,9 @@ components:
           type: string
         name:
           type: string
+      required:
+      - id
+      - name
       type: object
     MatchEntry_allOf:
       properties:
@@ -224,3 +296,8 @@ components:
       required:
       - repository
       - status
+  securitySchemes:
+    cookieAuth:
+      in: cookie
+      name: JWT
+      type: apiKey

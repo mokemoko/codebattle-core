@@ -69,4 +69,32 @@ var routes = Routes{
 		"/contests",
 		GetContests,
 	},
+
+	{
+		"PutMatch",
+		http.MethodPut,
+		"/contests/:contestId/matches",
+		PutMatch,
+	},
+
+	{
+		"PostEntry",
+		http.MethodPost,
+		"/entries",
+		PostEntry,
+	},
+
+	{
+		"PutEntry",
+		http.MethodPut,
+		"/entries/:entryId",
+		PutEntry,
+	},
+
+	{
+		"GetMe",
+		http.MethodGet,
+		"/users/me",
+		GetMe,
+	},
 }

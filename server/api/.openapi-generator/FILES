@@ -1,8 +1,9 @@
-.openapi-generator-ignore
 Dockerfile
 api/openapi.yaml
 go/README.md
 go/api_contests.go
+go/api_entries.go
+go/api_users.go
 go/model_contest.go
 go/model_get_contests_200_response_inner.go
 go/model_match.go
