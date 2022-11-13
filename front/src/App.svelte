@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Container, Row, Col } from 'sveltestrap'
-  import { ContestsApi, Configuration, Contest } from './generated'
+  import { ContestsApi, Configuration, Contest, UsersApi } from './generated'
   import LeaderBoard from './components/LeaderBoard.svelte'
   import Status from './components/Status.svelte'
   import Pickup from './components/Pickup.svelte'
@@ -8,6 +8,12 @@
   import Navigation from './components/Navigation.svelte'
 
   async function fetchData(): Promise<Contest> {
+    const userClient = new UsersApi(new Configuration({
+      basePath: 'http://localhost:8081',
+      credentials: 'include',
+    }))
+    const user = await userClient.getMe()
+
     const client = new ContestsApi(new Configuration({
       basePath: 'http://localhost:8081',
     }))

@@ -1,6 +1,6 @@
 generate-client:
 	docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate \
-		-i /local/server/openapi.yaml -g typescript-fetch -o /local/front/generated/
+		-i /local/server/openapi.yaml -g typescript-fetch -o /local/front/src/generated/
 generate-server:
 	docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate \
 		-i /local/server/openapi.yaml -g go-gin-server -o /local/server/api/
