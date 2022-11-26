@@ -52,7 +52,11 @@ func GetContestById(c *gin.Context) {
 		return
 	}
 
-	matches, err := contest.Matches(Load("Entry")).AllG(c.Request.Context())
+	matches, err := contest.Matches(
+		Load("Entry"),
+		OrderBy("created_at desc"),
+		Limit(20),
+	).AllG(c.Request.Context())
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),
