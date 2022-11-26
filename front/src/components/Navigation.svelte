@@ -9,7 +9,7 @@
 
   let user: User | null
 
-  userState.subscribe(u => user = u as User)
+  userState.subscribe(u => user = u)
 
 </script>
 
