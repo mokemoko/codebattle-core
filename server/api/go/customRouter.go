@@ -1,6 +1,9 @@
 package openapi
 
 import (
+	"github.com/mokemoko/codebattle-core/server/models"
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +15,10 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/github"
+)
+
+const (
+	userIdKey = "userId"
 )
 
 var authMiddleware *jwt.GinJWTMiddleware
@@ -33,9 +40,21 @@ func setup() {
 		//SecureCookie: true,
 		CookieHTTPOnly: true,
 		TokenLookup:    "cookie:jwt",
+		IdentityKey:    userIdKey,
+		IdentityHandler: func(c *gin.Context) interface{} {
+			return jwt.ExtractClaims(c)[userIdKey]
+		},
+		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			if userId, ok := data.(string); ok {
+				return jwt.MapClaims{
+					userIdKey: userId,
+				}
+			}
+			return jwt.MapClaims{}
+		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			if user, ok := c.Get("user"); ok {
-				return user, nil
+			if userId, ok := c.Get(userIdKey); ok {
+				return userId, nil
 			}
 			return nil, jwt.ErrFailedAuthentication
 		},
@@ -62,7 +81,20 @@ func addRoutes(router *gin.Engine) {
 			})
 			return
 		}
-		c.Set("user", user)
+		record := models.User{
+			ID:    user.UserID,
+			Name:  user.NickName,
+			Icon:  user.AvatarURL,
+			Token: null.StringFrom(user.AccessToken),
+		}
+		if err := record.UpsertG(c, true, []string{"id"}, boil.Infer(), boil.Infer()); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.Set(userIdKey, record.ID)
 		authMiddleware.LoginHandler(c)
 	})
 }

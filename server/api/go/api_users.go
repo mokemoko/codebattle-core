@@ -10,12 +10,27 @@
 package openapi
 
 import (
+	"github.com/mokemoko/codebattle-core/server/models"
+	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-// GetMe - 
+// GetMe -
 func GetMe(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
+	userId, _ := c.Get(userIdKey)
+
+	user, err := models.Users(
+		Where("id = ?", userId),
+	).OneG(c)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	} else {
+		c.JSON(http.StatusOK, User{
+			Id:   user.ID,
+			Name: user.Name,
+		})
+	}
 }

@@ -6,13 +6,19 @@
   import Pickup from './components/Pickup.svelte'
   import History from './components/History.svelte'
   import Navigation from './components/Navigation.svelte'
+  import { userState } from './state/user'
 
   async function fetchData(): Promise<Contest> {
     const userClient = new UsersApi(new Configuration({
       basePath: 'http://localhost:8081',
       credentials: 'include',
     }))
-    const user = await userClient.getMe()
+    try {
+      const user = await userClient.getMe()
+      userState.set(user)
+    } catch (e) {
+      console.debug(e)
+    }
 
     const client = new ContestsApi(new Configuration({
       basePath: 'http://localhost:8081',
