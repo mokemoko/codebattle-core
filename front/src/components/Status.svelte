@@ -1,13 +1,17 @@
 <script lang="ts">
   import { Badge, Button, Table } from 'sveltestrap'
   import type { User } from '../generated'
+  import EntryModal from './EntryModal.svelte'
 
   export let user: User
+
+  let isOpenModal = false
+  const modalCallback = () => isOpenModal = false
 </script>
 
 <h3>
   <span>Your Status</span>
-  <Button outline>Entry</Button>
+  <Button outline on:click={() => isOpenModal = true}>Entry</Button>
 </h3>
 <Table striped hover>
   <thead>
@@ -23,10 +27,13 @@
     <td>1</td>
     <td>sample</td>
     <td>100</td>
-    <td><Badge>Registered</Badge></td>
+    <td>
+      <Badge>Registered</Badge>
+    </td>
   </tr>
   </tbody>
 </Table>
+<EntryModal isOpen={isOpenModal} callback={modalCallback}/>
 
 <style>
   h3 {
