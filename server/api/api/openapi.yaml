@@ -80,7 +80,12 @@ paths:
   /entries:
     post:
       operationId: postEntry
-      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postEntry_request'
+        required: true
       responses:
         "200":
           content:
@@ -294,6 +299,23 @@ components:
       required:
       - id
       - name
+      type: object
+    postEntry_request:
+      properties:
+        contestId:
+          format: uuid
+          type: string
+        name:
+          example: bot example
+          maxLength: 20
+          type: string
+        repository:
+          format: url
+          type: string
+      required:
+      - contestId
+      - name
+      - repository
       type: object
     MatchEntry_allOf:
       properties:
