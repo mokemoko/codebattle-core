@@ -25,7 +25,7 @@
       </Col>
       <Col xs="4">
         {#if $userState}
-          <Status user={null}/>
+          <Status/>
         {/if}
         <History matches={$contestState.recentMatches}/>
       </Col>

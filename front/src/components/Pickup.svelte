@@ -7,7 +7,7 @@
 
 <h3>Pickup</h3>
 <!-- TODO: 汎用化 -->
-<BombermanMatchView match={match}/>
+<BombermanMatchView matchId={match.id}/>
 
 <style>
 </style>

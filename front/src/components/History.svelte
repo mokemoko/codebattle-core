@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { Button, Card, Col, Container, Row, Table } from 'sveltestrap'
+  import { Button, Card, Col, Container, Modal, ModalBody, Row, Table } from 'sveltestrap'
   import dayjs from 'dayjs'
   import type { Match } from '../generated'
   import ScoreLabel from './atoms/ScoreLabel.svelte'
   import RankLabel from './atoms/RankLabel.svelte'
+  import BombermanMatchView from '../bomberman/BombermanMatchView.svelte'
 
   export let matches: Match[]
+
+  let selectedId = ''
 </script>
 
 <h3>
@@ -34,10 +37,16 @@
           </Col>
         </Row>
       </Container>
-      <a href="#{match.id}" class="stretched-link"></a>
+      <a href="#{match.id}" on:click={() => selectedId = match.id} class="stretched-link"></a>
     </Card>
   </div>
 {/each}
+
+<Modal size="lg" isOpen={selectedId.length > 0} toggle={() => selectedId = ''}>
+  <ModalBody class="mx-auto">
+    <BombermanMatchView matchId={selectedId}/>
+  </ModalBody>
+</Modal>
 
 <style>
   h3 {

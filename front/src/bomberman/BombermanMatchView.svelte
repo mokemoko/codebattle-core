@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import type { Match } from '../generated'
   import { Game } from './game'
   import { Button, Icon, InputGroup } from 'sveltestrap'
 
-  export let match: Match
+  export let matchId: string
   export let showDetail = true
 
   let canvas: HTMLCanvasElement
@@ -43,9 +42,7 @@
   }
 
   onMount(async () => {
-    // TODO: fix
-    // const log = await fetchLog(`logs/${match.id}.log`)
-    const log = await fetchLog(`bomberman/log`)
+    const log = await fetchLog(`logs/${matchId}.log`)
 
     game = new Game(log, canvas)
 
