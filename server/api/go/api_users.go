@@ -22,6 +22,7 @@ func GetMe(c *gin.Context) {
 	userId, _ := c.Get(userIdKey)
 
 	user, err := models.Users(
+		Select("id", "name", "icon"),
 		Where("id = ?", userId),
 	).OneG(c)
 
@@ -31,6 +32,7 @@ func GetMe(c *gin.Context) {
 		c.JSON(http.StatusOK, User{
 			Id:   user.ID,
 			Name: user.Name,
+			Icon: user.Icon,
 		})
 	}
 }

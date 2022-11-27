@@ -90,7 +90,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrivateEntry'
+                $ref: '#/components/schemas/Entry'
   /entries/{entryId}:
     put:
       operationId: putEntry
@@ -110,7 +110,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrivateEntry'
+                $ref: '#/components/schemas/Entry'
 components:
   schemas:
     User:
@@ -122,6 +122,9 @@ components:
         name:
           type: string
           example: tester
+        icon:
+          type: string
+          example: https://gravatar.com/avatar/sample
       required: [ id, name ]
     Contest:
       type: object
@@ -143,7 +146,7 @@ components:
         ranking:
           type: array
           items:
-            $ref: '#/components/schemas/PublicEntry'
+            $ref: '#/components/schemas/Entry'
       required: [ id, owner, name ]
     Match:
       type: object
@@ -164,7 +167,7 @@ components:
     MatchEntry:
       type: object
       allOf:
-        - $ref: '#/components/schemas/PublicEntry'
+        - $ref: '#/components/schemas/Entry'
         - properties:
             rank:
               type: integer
@@ -179,7 +182,7 @@ components:
               minimum: 0
               maximum: 9999
       required: [ beforeScore ]
-    PublicEntry:
+    Entry:
       type: object
       properties:
         id:
@@ -195,24 +198,18 @@ components:
           type: integer
           minimum: 0
           maximum: 9999
+        repository:
+          type: string
+          format: url
+        status:
+          type: string
+          enum:
+            - processing
+            - registered
+            - error
+        error:
+          type: string
       required: [ id, name, user, score ]
-    PrivateEntry:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PublicEntry'
-        - properties:
-            repository:
-              type: string
-              format: url
-            status:
-              type: string
-              enum:
-                - processing
-                - registered
-                - error
-            error:
-              type: string
-          required: [repository, status ]
   securitySchemes:
     cookieAuth:
       type: apiKey

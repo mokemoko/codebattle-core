@@ -19,6 +19,12 @@ type MatchEntry struct {
 
 	Score int32 `json:"score"`
 
+	Repository string `json:"repository,omitempty"`
+
+	Status string `json:"status,omitempty"`
+
+	Error string `json:"error,omitempty"`
+
 	Rank int32 `json:"rank,omitempty"`
 
 	BeforeScore int32 `json:"beforeScore"`

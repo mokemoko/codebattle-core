@@ -9,11 +9,19 @@
 
 package openapi
 
-type PrivateEntryAllOf struct {
+type Entry struct {
 
-	Repository string `json:"repository"`
+	Id string `json:"id"`
 
-	Status string `json:"status"`
+	Name string `json:"name"`
+
+	User User `json:"user"`
+
+	Score int32 `json:"score"`
+
+	Repository string `json:"repository,omitempty"`
+
+	Status string `json:"status,omitempty"`
 
 	Error string `json:"error,omitempty"`
 }

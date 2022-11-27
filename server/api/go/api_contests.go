@@ -86,7 +86,7 @@ func GetContestById(c *gin.Context) {
 			Id:   entry.R.User.ID,
 			Name: entry.R.User.Name,
 		}
-		res.Ranking = append(res.Ranking, PublicEntry{
+		res.Ranking = append(res.Ranking, Entry{
 			Id:    entry.ID,
 			Name:  entry.Name,
 			User:  users[entry.R.User.ID],

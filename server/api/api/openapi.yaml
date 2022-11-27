@@ -73,6 +73,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Match'
           description: ok
+      security:
+      - cookieAuth: []
       tags:
       - contests
   /entries:
@@ -84,8 +86,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrivateEntry'
+                $ref: '#/components/schemas/Entry'
           description: ok
+      security:
+      - cookieAuth: []
       tags:
       - entries
   /entries/{entryId}:
@@ -105,8 +109,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrivateEntry'
+                $ref: '#/components/schemas/Entry'
           description: ok
+      security:
+      - cookieAuth: []
       tags:
       - entries
 components:
@@ -114,6 +120,7 @@ components:
     User:
       example:
         name: tester
+        icon: https://gravatar.com/avatar/sample
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
         id:
@@ -121,6 +128,9 @@ components:
           type: string
         name:
           example: tester
+          type: string
+        icon:
+          example: https://gravatar.com/avatar/sample
           type: string
       required:
       - id
@@ -130,6 +140,7 @@ components:
       example:
         owner:
           name: tester
+          icon: https://gravatar.com/avatar/sample
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         name: Sample Game
         description: description
@@ -152,15 +163,23 @@ components:
         - score: 800
           name: bot example
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          repository: http://example.com/aeiou
+          error: error
           user:
             name: tester
+            icon: https://gravatar.com/avatar/sample
             id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: processing
         - score: 800
           name: bot example
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          repository: http://example.com/aeiou
+          error: error
           user:
             name: tester
+            icon: https://gravatar.com/avatar/sample
             id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: processing
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
         id:
@@ -179,7 +198,7 @@ components:
           type: array
         ranking:
           items:
-            $ref: '#/components/schemas/PublicEntry'
+            $ref: '#/components/schemas/Entry'
           type: array
       required:
       - id
@@ -214,19 +233,23 @@ components:
       type: object
     MatchEntry:
       allOf:
-      - $ref: '#/components/schemas/PublicEntry'
+      - $ref: '#/components/schemas/Entry'
       - $ref: '#/components/schemas/MatchEntry_allOf'
       required:
       - beforeScore
       type: object
-    PublicEntry:
+    Entry:
       example:
         score: 800
         name: bot example
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        repository: http://example.com/aeiou
+        error: error
         user:
           name: tester
+          icon: https://gravatar.com/avatar/sample
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: processing
       properties:
         id:
           format: uuid
@@ -241,16 +264,22 @@ components:
           maximum: 9999
           minimum: 0
           type: integer
+        repository:
+          format: url
+          type: string
+        status:
+          enum:
+          - processing
+          - registered
+          - error
+          type: string
+        error:
+          type: string
       required:
       - id
       - name
       - score
       - user
-      type: object
-    PrivateEntry:
-      allOf:
-      - $ref: '#/components/schemas/PublicEntry'
-      - $ref: '#/components/schemas/PrivateEntry_allOf'
       type: object
     getContests_200_response_inner:
       example:
@@ -280,22 +309,6 @@ components:
           maximum: 9999
           minimum: 0
           type: integer
-    PrivateEntry_allOf:
-      properties:
-        repository:
-          format: url
-          type: string
-        status:
-          enum:
-          - processing
-          - registered
-          - error
-          type: string
-        error:
-          type: string
-      required:
-      - repository
-      - status
   securitySchemes:
     cookieAuth:
       in: cookie
