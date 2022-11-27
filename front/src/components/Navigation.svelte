@@ -4,13 +4,7 @@
     Dropdown, DropdownItem, DropdownMenu, DropdownToggle,
     Nav, NavItem, NavLink, Navbar, NavbarBrand,
   } from 'sveltestrap'
-  import { userState } from '../state/user'
-  import type { User } from '../generated'
-
-  let user: User | null
-
-  userState.subscribe(u => user = u)
-
+  import { userState } from '../domain/state'
 </script>
 
 <Navbar color="light" light expand="md">
@@ -18,8 +12,8 @@
   <Collapse navbar isOpen>
     <Nav class="ms-auto" navbar>
       <Dropdown nav inNavbar>
-        {#if user}
-          <DropdownToggle nav caret>{user.name}</DropdownToggle>
+        {#if $userState}
+          <DropdownToggle nav caret>{$userState.name}</DropdownToggle>
           <DropdownMenu end>
             <DropdownItem href="#" disabled>Logout</DropdownItem>
           </DropdownMenu>
