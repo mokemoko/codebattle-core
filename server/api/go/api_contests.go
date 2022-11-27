@@ -85,7 +85,9 @@ func GetContestById(c *gin.Context) {
 		users[entry.R.User.ID] = User{
 			Id:   entry.R.User.ID,
 			Name: entry.R.User.Name,
+			Icon: entry.R.User.Icon,
 		}
+		// TODO: 自身のentryは追加情報返す？
 		res.Ranking = append(res.Ranking, Entry{
 			Id:    entry.ID,
 			Name:  entry.Name,

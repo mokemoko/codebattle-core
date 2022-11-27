@@ -8,9 +8,9 @@ paths:
   /users/me:
     get:
       operationId: getMe
-      tags: [users]
+      tags: [ users ]
       security:
-        - cookieAuth: []
+        - cookieAuth: [ ]
       responses:
         '200':
           description: ok
@@ -21,7 +21,7 @@ paths:
   /contests:
     get:
       operationId: getContests
-      tags: [contests]
+      tags: [ contests ]
       responses:
         '200':
           description: ok
@@ -37,11 +37,11 @@ paths:
                       format: uuid
                     name:
                       type: string
-                  required: [id, name]
+                  required: [ id, name ]
   /contests/{contestId}:
     get:
       operationId: getContestById
-      tags: [contests]
+      tags: [ contests ]
       parameters:
         - name: contestId
           in: path
@@ -59,9 +59,9 @@ paths:
   /contests/{contestId}/matches:
     put:
       operationId: putMatch
-      tags: [contests]
+      tags: [ contests ]
       security:
-        - cookieAuth: []
+        - cookieAuth: [ ]
       parameters:
         - name: contestId
           in: path
@@ -79,11 +79,27 @@ paths:
   /entries:
     post:
       operationId: postEntry
-      tags: [entries]
+      tags: [ entries ]
       security:
-        - cookieAuth: []
-      parameters:
-        -
+        - cookieAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contestId:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                  example: bot example
+                  maxLength: 20
+                repository:
+                  type: string
+                  format: url
+              required: [ contestId, name, repository ]
       responses:
         '200':
           description: ok
@@ -94,9 +110,9 @@ paths:
   /entries/{entryId}:
     put:
       operationId: putEntry
-      tags: [entries]
+      tags: [ entries ]
       security:
-        - cookieAuth: []
+        - cookieAuth: [ ]
       parameters:
         - name: entryId
           in: path

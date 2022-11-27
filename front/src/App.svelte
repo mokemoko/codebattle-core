@@ -6,7 +6,7 @@
   import History from './components/History.svelte'
   import Navigation from './components/Navigation.svelte'
   import { loadData } from './domain/usecase'
-  import { contestState } from './domain/state'
+  import { contestState, userState } from './domain/state'
   import { onMount } from 'svelte'
 
   onMount(() => loadData())
@@ -24,7 +24,9 @@
         <LeaderBoard entries={$contestState.ranking}/>
       </Col>
       <Col xs="4">
-        <Status user={null}/>
+        {#if $userState}
+          <Status user={null}/>
+        {/if}
         <History matches={$contestState.recentMatches}/>
       </Col>
     </Row>
