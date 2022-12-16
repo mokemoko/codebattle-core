@@ -16,8 +16,8 @@
 <span class="font-monospace">
 <span style="color: {scoreColor}">{score.toLocaleString()}</span>
   {#if delta}
-  (<span class={delta >= 0 ? 'text-primary' : 'text-danger'}>{delta >= 0 ? '+' : ''}{delta.toLocaleString()}</span>)
-{/if}
+    (<span class={delta >= 0 ? 'text-primary' : 'text-danger'}>{delta >= 0 ? '+' : ''}{delta.toLocaleString()}</span>)
+  {/if}
 </span>
 
 <style>
