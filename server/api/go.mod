@@ -27,7 +27,6 @@ require (
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
-	github.com/volatiletech/null/v8 v8.1.2 // indirect
 	github.com/volatiletech/randomize v0.0.1 // indirect
 	github.com/volatiletech/strmangle v0.0.4 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
@@ -44,9 +43,11 @@ require (
 require (
 	github.com/appleboy/gin-jwt/v2 v2.9.0
 	github.com/gin-contrib/cors v1.4.0
+	github.com/google/uuid v1.3.0
 	github.com/markbates/goth v1.75.1
 	github.com/mattn/go-sqlite3 v1.14.10
 	github.com/mokemoko/codebattle-core/server/models v0.1.0
+	github.com/volatiletech/null/v8 v8.1.2
 	github.com/volatiletech/sqlboiler/v4 v4.13.0
 )
 

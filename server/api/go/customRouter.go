@@ -105,6 +105,7 @@ func customRouter(baseRouter *gin.Engine) (*gin.RouterGroup, *gin.RouterGroup) {
 	baseRouter.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{os.Getenv("FRONT_DOMAIN")},
 		AllowCredentials: true,
+		AllowHeaders:     []string{"content-type"},
 	}))
 
 	unauthorizedRouter := baseRouter.Group("")
