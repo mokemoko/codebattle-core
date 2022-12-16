@@ -111,7 +111,7 @@ func RunEntry() {
 			if err != nil {
 				log.Fatal(err)
 			} else {
-				break
+				continue
 			}
 		}
 		err = buildImage(entry)
@@ -121,7 +121,7 @@ func RunEntry() {
 			if err != nil {
 				log.Fatal(err)
 			} else {
-				break
+				continue
 			}
 		}
 		entry.Status = 1
