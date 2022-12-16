@@ -10,15 +10,13 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
+	"github.com/mokemoko/codebattle-core/server/models"
 	"log"
 
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/volatiletech/sqlboiler/v4/boil"
-
 	sw "codebattle/server/api/go"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Args struct {
@@ -34,22 +32,10 @@ func parseArgs() Args {
 	return args
 }
 
-func setupDatabase(args Args) error {
-	db, err := sql.Open("sqlite3", "../sql/db.sqlite3")
-	if err != nil {
-		return err
-	}
-	if args.IsDebug {
-		boil.DebugMode = true
-	}
-	boil.SetDB(db)
-	return nil
-}
-
 func main() {
 	args := parseArgs()
 
-	if err := setupDatabase(args); err != nil {
+	if err := models.SetupDatabase(args.IsDebug); err != nil {
 		log.Fatal(err)
 	}
 

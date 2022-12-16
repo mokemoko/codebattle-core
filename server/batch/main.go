@@ -2,14 +2,13 @@ package main
 
 import (
 	"batch/commands"
-	"database/sql"
 	"flag"
+	"github.com/mokemoko/codebattle-core/server/models"
 	"log"
 	"math/rand"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 type Args struct {
@@ -31,18 +30,6 @@ func parseArgs() Args {
 	return args
 }
 
-func setupDatabase(args Args) error {
-	db, err := sql.Open("sqlite3", "../sql/db.sqlite3")
-	if err != nil {
-		return err
-	}
-	if args.IsDebug {
-		boil.DebugMode = true
-	}
-	boil.SetDB(db)
-	return nil
-}
-
 func init() {
 	log.SetFlags(log.Llongfile)
 	rand.Seed(time.Now().UnixNano())
@@ -51,8 +38,7 @@ func init() {
 func main() {
 	args := parseArgs()
 
-	err := setupDatabase(args)
-	if err != nil {
+	if err := models.SetupDatabase(args.IsDebug); err != nil {
 		log.Fatal(err)
 	}
 

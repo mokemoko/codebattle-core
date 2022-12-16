@@ -3,13 +3,11 @@ package commands
 import (
 	"context"
 	"database/sql"
-	"log"
-	"time"
-
 	"github.com/google/uuid"
 	"github.com/mokemoko/codebattle-core/server/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"log"
 )
 
 type MatchInfo struct {
@@ -33,7 +31,6 @@ func makeMatch(contest *models.Contest) (*MatchInfo, error) {
 	}
 
 	matchId := uuid.NewString()
-	ts := time.Now().UTC().Format("2006-01-02T15:04:05Z")
 
 	tx, err := boil.GetDB().(*sql.DB).Begin()
 	if err != nil {
@@ -47,8 +44,6 @@ func makeMatch(contest *models.Contest) (*MatchInfo, error) {
 			ContestID:   contest.ID,
 			BeforeScore: entry.Score,
 			AfterScore:  entry.Score,
-			CreatedAt:   ts,
-			UpdatedAt:   ts,
 		}
 		err = matchEntry.Insert(context.Background(), tx, boil.Infer())
 		if err != nil {
