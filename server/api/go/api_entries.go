@@ -35,6 +35,7 @@ func PostEntry(c *gin.Context) {
 		ContestID:  json.ContestId,
 		Name:       json.Name,
 		Repository: json.Repository,
+		Score:      1500,
 	}
 	if err := entry.InsertG(c.Request.Context(), boil.Infer()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})

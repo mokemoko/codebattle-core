@@ -127,6 +127,7 @@ func saveMatch(matchEntries []*models.Match) error {
 			return err
 		}
 	}
+	// TODO: update entry
 
 	err = tx.Commit()
 	return err

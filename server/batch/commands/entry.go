@@ -12,16 +12,28 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/mokemoko/codebattle-core/server/models"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"log"
 	"os"
+	"strings"
 )
 
 func genRepoHash(entry *models.Entry) string {
 	h := sha1.New()
 	h.Write([]byte(entry.Repository))
 	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+func getBranchName(entry *models.Entry) string {
+	s := strings.SplitN(entry.Repository, "#", 2)
+	if len(s) == 2 {
+		return s[1]
+	} else {
+		return "main"
+	}
+
 }
 
 func getEntry() (*models.Entry, error) {
@@ -43,9 +55,8 @@ func pullRepo(entry *models.Entry) error {
 	dir := fmt.Sprintf("work/%s", genRepoHash(entry))
 	_ = os.RemoveAll(dir)
 	_, err := git.PlainClone(dir, false, &git.CloneOptions{
-		URL: entry.Repository,
-		// TODO: enable to specify branch
-		ReferenceName: plumbing.NewBranchReferenceName("main"),
+		URL:           entry.Repository,
+		ReferenceName: plumbing.NewBranchReferenceName(getBranchName(entry)),
 		Auth: &http.BasicAuth{
 			Username: entry.R.User.Name,
 			Password: entry.R.User.Token.String,
@@ -74,7 +85,7 @@ func buildImage(entry *models.Entry) error {
 		SuppressOutput: true,
 		Remove:         true,
 		ForceRemove:    true,
-		Dockerfile:     "sample/dummy/Dockerfile",
+		Dockerfile:     "Dockerfile",
 	})
 	if err != nil {
 		return err
@@ -124,7 +135,9 @@ func RunEntry() {
 				continue
 			}
 		}
+		// success
 		entry.Status = 1
+		entry.Error = null.String{}
 		err = updateEntry(entry)
 		if err != nil {
 			log.Fatal(err)
