@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { Badge, Button, Table } from 'sveltestrap'
+  import { Button, Table } from 'sveltestrap'
   import type { Entry } from '../generated'
   import EntryModal from './EntryModal.svelte'
   import { contestState, userState } from '../domain/state'
   import { get } from 'svelte/store'
+  import StatusBadge from './atoms/StatusBadge.svelte'
 
   let entries: Entry[] = []
   let selectedEntry: Entry | null
@@ -40,7 +41,7 @@
       <td>{entry.name}</td>
       <td>{entry.score}</td>
       <td>
-        <Badge>{entry.status}</Badge>
+        <StatusBadge status={entry.status}/>
       </td>
     </tr>
   {/each}

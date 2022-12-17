@@ -40,13 +40,18 @@
       <FormGroup floating label="Repository">
         <Input bind:value={repository}/>
       </FormGroup>
+      {#if entry}
+        <FormGroup floating label="Error">
+          <Input value={entry.error} readonly/>
+        </FormGroup>
+      {/if}
     </Form>
     {#if error.length > 0}
       <span class="text-danger">{error}</span>
     {/if}
   </ModalBody>
   <ModalFooter>
-    <Button color="primary" on:click={onSubmit}>Submit</Button>
+    <Button color="primary" on:click={onSubmit}>{entry ? 'Update' : 'Register'}</Button>
     <Button color="secondary" on:click={callback}>Cancel</Button>
   </ModalFooter>
 </Modal>

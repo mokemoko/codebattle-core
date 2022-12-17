@@ -18,8 +18,25 @@ import (
 	"time"
 )
 
+func getUserIdFromJWT(c *gin.Context) string {
+	// TODO: refactor
+	claims, _ := authMiddleware.GetClaimsFromJWT(c)
+	if claims == nil {
+		return ""
+	}
+	if val, ok := claims[userIdKey]; ok {
+		return val.(string)
+	}
+	return ""
+}
+
+func getStatusString(status int64) string {
+	return []string{"processing", "registered", "error", "disabled"}[status]
+}
+
 // GetContestById -
 func GetContestById(c *gin.Context) {
+	userId := getUserIdFromJWT(c)
 	contestId := c.Param("contestId")
 
 	contest, err := models.Contests(
@@ -87,13 +104,19 @@ func GetContestById(c *gin.Context) {
 			Name: entry.R.User.Name,
 			Icon: entry.R.User.Icon,
 		}
-		// TODO: 自身のentryは追加情報返す？
-		res.Ranking = append(res.Ranking, Entry{
+		e := Entry{
 			Id:    entry.ID,
 			Name:  entry.Name,
 			User:  users[entry.R.User.ID],
 			Score: int32(entry.Score),
-		})
+		}
+		// 自身のentryは追加情報返す
+		if entry.R.User.ID == userId {
+			e.Error = entry.Error.String
+			e.Status = getStatusString(entry.Status)
+			e.Repository = entry.Repository
+		}
+		res.Ranking = append(res.Ranking, e)
 	}
 	tmpMatch := Match{}
 	for _, match := range matches {
