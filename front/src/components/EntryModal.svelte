@@ -1,26 +1,34 @@
 <script lang="ts">
   import { Button, Form, FormGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap'
-  import { registerEntry } from '../domain/usecase'
+  import { registerEntry, updateEntry } from '../domain/usecase'
+  import type { Entry } from '../generated'
 
-  let isOpen = false
-  let name = ''
-  let repository = ''
+  export let isOpen: boolean
+  export let entry: Entry | null
+  export let callback: () => {}
+
+  export let name = ''
+  export let repository = ''
+
   let error = ''
 
   const onSubmit = async () => {
     try {
-      await registerEntry(name, repository)
+      if (entry) {
+        await updateEntry(entry.id, name, repository)
+      } else {
+        await registerEntry(name, repository)
+      }
     } catch (e) {
       error = e.message
       return
     }
     name = ''
     repository = ''
-    isOpen = false
+    error = ''
+    callback()
   }
 </script>
-
-<Button outline on:click={() => isOpen = true}>Entry</Button>
 
 <Modal isOpen={isOpen}>
   <ModalHeader>Entry</ModalHeader>
@@ -39,7 +47,7 @@
   </ModalBody>
   <ModalFooter>
     <Button color="primary" on:click={onSubmit}>Submit</Button>
-    <Button color="secondary" on:click={() => isOpen = false}>Cancel</Button>
+    <Button color="secondary" on:click={callback}>Cancel</Button>
   </ModalFooter>
 </Modal>
 

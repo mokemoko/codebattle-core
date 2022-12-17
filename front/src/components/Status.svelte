@@ -1,21 +1,28 @@
 <script lang="ts">
-  import { Badge, Table } from 'sveltestrap'
+  import { Badge, Button, Table } from 'sveltestrap'
   import type { Entry } from '../generated'
-  import EntryModalButton from './EntryModalButton.svelte'
+  import EntryModal from './EntryModal.svelte'
   import { contestState, userState } from '../domain/state'
   import { get } from 'svelte/store'
 
   let entries: Entry[] = []
+  let selectedEntry: Entry | null
+  let isOpen = false
 
   contestState.subscribe(contest => {
     const userId = get(userState).id
     entries = contest.ranking.filter(entry => entry.user.id === userId)
   })
+
+  const selectEntry = (entry: Entry | null) => {
+    selectedEntry = entry
+    isOpen = true
+  }
 </script>
 
 <h3>
   <span>Your Status</span>
-  <EntryModalButton/>
+  <Button outline on:click={() => selectEntry(null)}>Entry</Button>
 </h3>
 <Table striped hover>
   <thead>
@@ -28,7 +35,7 @@
   </thead>
   <tbody>
   {#each entries as entry, i}
-    <tr>
+    <tr on:click={() => selectEntry(entry)}>
       <td>{i + 1}</td>
       <td>{entry.name}</td>
       <td>{entry.score}</td>
@@ -39,6 +46,11 @@
   {/each}
   </tbody>
 </Table>
+
+<!-- model -->
+<EntryModal isOpen={isOpen} entry={selectedEntry}
+            name={selectedEntry?.name || ''} repository={selectedEntry?.repository || ''}
+            callback={() => isOpen = false}/>
 
 <style>
   h3 {
