@@ -39,6 +39,7 @@ func setup() {
 		SendCookie: true,
 		//SecureCookie: true,
 		CookieHTTPOnly: true,
+		Timeout:        time.Hour * 24 * 30, // one month
 		TokenLookup:    "cookie:jwt",
 		IdentityKey:    userIdKey,
 		IdentityHandler: func(c *gin.Context) interface{} {

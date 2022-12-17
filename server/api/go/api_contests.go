@@ -23,7 +23,7 @@ func GetContestById(c *gin.Context) {
 	contestId := c.Param("contestId")
 
 	contest, err := models.Contests(
-		Where("id = ?", contestId),
+		models.ContestWhere.ID.EQ(contestId),
 		Load("OwnerUser"),
 	).OneG(c.Request.Context())
 

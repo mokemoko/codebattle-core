@@ -10,12 +10,14 @@
 package openapi
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/mokemoko/codebattle-core/server/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
@@ -46,5 +48,36 @@ func PostEntry(c *gin.Context) {
 
 // PutEntry -
 func PutEntry(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
+	userId, _ := c.Get(userIdKey)
+	entryId := c.Param("entryId")
+
+	var json PostEntryRequest
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	entry, err := models.Entries(
+		models.EntryWhere.ID.EQ(entryId),
+		models.EntryWhere.UserID.EQ(userId.(string)),
+	).OneG(c.Request.Context())
+
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	entry.Name = json.Name
+	entry.Repository = json.Repository
+	entry.Status = 0
+	entry.Error = null.String{}
+
+	if _, err := entry.UpdateG(c.Request.Context(), boil.Infer()); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, entry)
 }
