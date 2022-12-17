@@ -17,7 +17,16 @@ export async function loadData() {
 
 export async function registerEntry(name: string, repository: string) {
   const contestId = get(contestState).id
-  await entryClient.postEntry({ postEntryRequest: { contestId, name, repository } })
+  await entryClient.postEntry({ entryRequest: { contestId, name, repository } })
+
+  const updated = await contestClient.getContestById({ contestId })
+  contestState.set(updated)
+}
+
+export async function updateEntry(id: string, name: string, repository: string) {
+  const contestId = get(contestState).id
+  await entryClient.putEntry({ entryId: id, entryRequest: { contestId, name, repository } })
+  await entryClient.postEntry({ entryRequest: { contestId, name, repository } })
 
   const updated = await contestClient.getContestById({ contestId })
   contestState.set(updated)

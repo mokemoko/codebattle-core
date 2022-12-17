@@ -87,19 +87,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                contestId:
-                  type: string
-                  format: uuid
-                name:
-                  type: string
-                  example: bot example
-                  maxLength: 20
-                repository:
-                  type: string
-                  format: url
-              required: [ contestId, name, repository ]
+              $ref: '#/components/schemas/EntryRequest'
       responses:
         '200':
           description: ok
@@ -120,6 +108,12 @@ paths:
           schema:
             type: string
             format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryRequest'
       responses:
         '200':
           description: ok
@@ -226,6 +220,21 @@ components:
         error:
           type: string
       required: [ id, name, user, score ]
+    EntryRequest:
+      type: object
+      properties:
+        contestId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: bot example
+          maxLength: 20
+        repository:
+          type: string
+          format: url
+      required: [ contestId, name, repository ]
+
   securitySchemes:
     cookieAuth:
       type: apiKey

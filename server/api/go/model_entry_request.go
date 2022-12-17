@@ -9,7 +9,7 @@
 
 package openapi
 
-type PostEntryRequest struct {
+type EntryRequest struct {
 
 	ContestId string `json:"contestId"`
 

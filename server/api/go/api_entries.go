@@ -25,7 +25,7 @@ import (
 func PostEntry(c *gin.Context) {
 	userId, _ := c.Get(userIdKey)
 
-	var json PostEntryRequest
+	var json EntryRequest
 	if err := c.ShouldBindJSON(&json); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -51,7 +51,7 @@ func PutEntry(c *gin.Context) {
 	userId, _ := c.Get(userIdKey)
 	entryId := c.Param("entryId")
 
-	var json PostEntryRequest
+	var json EntryRequest
 	if err := c.ShouldBindJSON(&json); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -84,7 +84,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/postEntry_request'
+              $ref: '#/components/schemas/EntryRequest'
         required: true
       responses:
         "200":
@@ -109,6 +109,12 @@ paths:
           format: uuid
           type: string
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryRequest'
+        required: true
       responses:
         "200":
           content:
@@ -286,21 +292,11 @@ components:
       - score
       - user
       type: object
-    getContests_200_response_inner:
+    EntryRequest:
       example:
-        name: name
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-      properties:
-        id:
-          format: uuid
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
-      type: object
-    postEntry_request:
+        contestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        name: bot example
+        repository: http://example.com/aeiou
       properties:
         contestId:
           format: uuid
@@ -316,6 +312,20 @@ components:
       - contestId
       - name
       - repository
+      type: object
+    getContests_200_response_inner:
+      example:
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
       type: object
     MatchEntry_allOf:
       properties:
