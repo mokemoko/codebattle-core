@@ -5,6 +5,7 @@
   import { contestState, userState } from '../domain/state'
   import { get } from 'svelte/store'
   import StatusBadge from './atoms/StatusBadge.svelte'
+  import ScoreLabel from './atoms/ScoreLabel.svelte'
 
   let entries: Entry[] = []
   let selectedEntry: Entry | null
@@ -39,7 +40,9 @@
     <tr on:click={() => selectEntry(entry)}>
       <td>{i + 1}</td>
       <td>{entry.name}</td>
-      <td>{entry.score}</td>
+      <td>
+        <ScoreLabel score={entry.score}/>
+      </td>
       <td>
         <StatusBadge status={entry.status}/>
       </td>
