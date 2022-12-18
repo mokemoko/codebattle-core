@@ -56,7 +56,10 @@ func GetContestById(c *gin.Context) {
 		return
 	}
 
-	entries, err := contest.Entries(Load("User")).AllG(c.Request.Context())
+	entries, err := contest.Entries(
+		OrderBy("score desc"),
+		Load("User"),
+	).AllG(c.Request.Context())
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),

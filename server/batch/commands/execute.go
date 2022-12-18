@@ -109,6 +109,8 @@ func rateMatch(matchEntries []*models.Match) {
 			entry1.AfterScore += diff
 			entry2.AfterScore -= diff
 		}
+		entry1.R.Entry.Score = entry1.AfterScore
+		entry2.R.Entry.Score = entry2.AfterScore
 	}
 }
 
@@ -126,8 +128,12 @@ func saveMatch(matchEntries []*models.Match) error {
 			_ = tx.Rollback()
 			return err
 		}
+		_, err = matchEntry.R.Entry.Update(context.Background(), tx, boil.Infer())
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
 	}
-	// TODO: update entry
 
 	err = tx.Commit()
 	return err
