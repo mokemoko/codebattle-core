@@ -5,15 +5,17 @@
   import ScoreLabel from './atoms/ScoreLabel.svelte'
   import RankLabel from './atoms/RankLabel.svelte'
   import BombermanMatchView from '../bomberman/BombermanMatchView.svelte'
+  import MatchModal from './MatchModal.svelte'
 
   export let matches: Match[]
 
+  let isOpenMatchEntry = false
   let selectedId = ''
 </script>
 
 <h3>
   <span>Matching History</span>
-  <Button outline>Battle</Button>
+  <Button outline on:click={() => isOpenMatchEntry = true}>Battle</Button>
 </h3>
 
 {#each matches as match}
@@ -47,6 +49,8 @@
     <BombermanMatchView matchId={selectedId}/>
   </ModalBody>
 </Modal>
+
+<MatchModal isOpen={isOpenMatchEntry} callback={() => isOpenMatchEntry = false}/>
 
 <style>
   h3 {

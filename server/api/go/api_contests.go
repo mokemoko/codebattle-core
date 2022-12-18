@@ -11,11 +11,13 @@ package openapi
 
 import (
 	"database/sql"
-	"github.com/gin-gonic/gin"
-	"github.com/mokemoko/codebattle-core/server/models"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
 	"time"
+
+	"github.com/mokemoko/codebattle-core/server/models"
+
+	"github.com/gin-gonic/gin"
+	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 func getUserIdFromJWT(c *gin.Context) string {
@@ -56,6 +58,7 @@ func GetContestById(c *gin.Context) {
 		return
 	}
 
+	// TODO: 自身のentryは別APIで取得するようにしてregisteredに絞る
 	entries, err := contest.Entries(
 		OrderBy("score desc"),
 		Load("User"),
