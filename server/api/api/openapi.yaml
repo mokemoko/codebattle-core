@@ -283,6 +283,7 @@ components:
           - processing
           - registered
           - error
+          - disabled
           type: string
         error:
           type: string

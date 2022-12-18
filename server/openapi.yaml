@@ -217,6 +217,7 @@ components:
             - processing
             - registered
             - error
+            - disabled
         error:
           type: string
       required: [ id, name, user, score ]
