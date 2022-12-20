@@ -23,7 +23,7 @@ func makeMatch(contest *models.Contest) (*MatchInfo, error) {
 
 	entries, err := models.Entries(
 		models.EntryWhere.ContestID.EQ(contest.ID),
-		models.EntryWhere.Status.EQ(1),
+		models.EntryWhere.Status.EQ(models.EntryStatusRegistered.Code),
 		OrderBy("RANDOM()"),
 		Limit(4), // 一旦4人対戦固定
 	).AllG(context.Background())

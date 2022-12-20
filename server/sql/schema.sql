@@ -43,6 +43,7 @@ CREATE TABLE entry
     FOREIGN KEY (contest_id) REFERENCES contest (id)
 );
 
+# TODO: 正規化
 DROP TABLE IF EXISTS `match`;
 CREATE TABLE `match`
 (

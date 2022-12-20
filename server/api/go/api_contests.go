@@ -32,10 +32,6 @@ func getUserIdFromJWT(c *gin.Context) string {
 	return ""
 }
 
-func getStatusString(status int64) string {
-	return []string{"processing", "registered", "error", "disabled"}[status]
-}
-
 // GetContestById -
 func GetContestById(c *gin.Context) {
 	userId := getUserIdFromJWT(c)
@@ -119,7 +115,7 @@ func GetContestById(c *gin.Context) {
 		// 自身のentryは追加情報返す
 		if entry.R.User.ID == userId {
 			e.Error = entry.Error.String
-			e.Status = getStatusString(entry.Status)
+			e.Status = models.NewEntryStatus(entry.Status).Name
 			e.Repository = entry.Repository
 		}
 		res.Ranking = append(res.Ranking, e)

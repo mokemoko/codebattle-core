@@ -38,7 +38,7 @@ func getBranchName(entry *models.Entry) string {
 
 func getEntry() (*models.Entry, error) {
 	entry, err := models.Entries(
-		models.EntryWhere.Status.EQ(0),
+		models.EntryWhere.Status.EQ(models.EntryStatusAccepted.Code),
 		Load(models.EntryRels.User),
 	).OneG(context.Background())
 	if err != nil {
@@ -48,7 +48,10 @@ func getEntry() (*models.Entry, error) {
 			return nil, err
 		}
 	}
-	return entry, nil
+	// 取得時点でステータスは処理中に
+	entry.Status = models.EntryStatusProcessing.Code
+	err = updateEntry(entry)
+	return entry, err
 }
 
 func pullRepo(entry *models.Entry) error {
@@ -99,7 +102,7 @@ func updateEntry(entry *models.Entry) error {
 }
 
 func applyError(entry *models.Entry, err error) error {
-	entry.Status = 2
+	entry.Status = models.EntryStatusError.Code
 	entry.Error.SetValid(err.Error())
 	return updateEntry(entry)
 }
@@ -136,7 +139,7 @@ func RunEntry() {
 			}
 		}
 		// success
-		entry.Status = 1
+		entry.Status = models.EntryStatusRegistered.Code
 		entry.Error = null.String{}
 		err = updateEntry(entry)
 		if err != nil {
