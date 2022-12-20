@@ -29,6 +29,7 @@ type ExecuteResult struct {
 func getMatchList(matchId string) ([]*models.Match, error) {
 	return models.Matches(
 		models.MatchWhere.ID.EQ(matchId),
+		OrderBy("entry_id"),
 		Load(models.MatchRels.Entry),
 	).AllG(context.Background())
 }

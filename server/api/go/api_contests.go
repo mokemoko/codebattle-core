@@ -74,6 +74,8 @@ func GetContestById(c *gin.Context) {
 	matches, err := contest.Matches(
 		Load("Entry"),
 		OrderBy("created_at desc"),
+		OrderBy("id"),
+		OrderBy("entry_id"),
 		Limit(40),
 	).AllG(c.Request.Context())
 	if err != nil {
