@@ -24,7 +24,7 @@ type MatchStatus struct {
 }
 
 func NewMatchStatus(code int64) MatchStatus {
-	name := []string{"requested", "ongoing", "finished"}[code]
+	name := []string{"requested", "ongoing", "finished", "error"}[code]
 	return MatchStatus{Code: code, Name: name}
 }
 
@@ -32,6 +32,7 @@ var (
 	MatchStatusRequested = NewMatchStatus(0)
 	MatchStatusOngoing   = NewMatchStatus(1)
 	MatchStatusFinished  = NewMatchStatus(2)
+	MatchStatusError     = NewMatchStatus(3)
 )
 
 type MatchType struct {

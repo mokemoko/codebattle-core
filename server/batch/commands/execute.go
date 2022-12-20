@@ -139,6 +139,25 @@ func saveMatch(matchEntries []*models.Match) error {
 	return err
 }
 
+func updateMatchStatus(matchEntries []*models.Match, status models.MatchStatus) error {
+	tx, err := boil.GetDB().(*sql.DB).Begin()
+	if err != nil {
+		return err
+	}
+
+	for _, matchEntry := range matchEntries {
+		matchEntry.Status = status.Code
+		_, err = matchEntry.Update(context.Background(), tx, boil.Infer())
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	return err
+}
+
 func RunExecute() {
 	matchList, err := models.Matches(
 		models.MatchWhere.Status.EQ(models.MatchStatusRequested.Code),
@@ -152,17 +171,26 @@ func RunExecute() {
 	for _, match := range matchList {
 		matchList, err := getMatchList(match.ID)
 		if err != nil {
-			log.Fatal(err)
+			log.Print(match.ID, err)
+			continue
 		}
-		// TODO: statusを更新
+		if err = updateMatchStatus(matchList, models.MatchStatusOngoing); err != nil {
+			log.Print(match.ID, err)
+			continue
+		}
 		result, err := executeMatch(matchList)
 		if err != nil {
-			log.Fatal(err)
+			log.Print(match.ID, err)
+			if err = updateMatchStatus(matchList, models.MatchStatusError); err != nil {
+				log.Print(match.ID, err)
+			}
+			continue
 		}
 		rateMatch(matchList)
 		err = saveMatch(matchList)
 		if err != nil {
-			log.Fatal(err)
+			log.Print(match.ID, err)
+			continue
 		}
 		log.Printf("%+v", result)
 	}

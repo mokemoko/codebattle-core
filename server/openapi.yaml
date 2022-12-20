@@ -190,6 +190,7 @@ components:
             - requested
             - ongoing
             - finished
+            - error
         createdAt:
           type: string
           format: date-time
