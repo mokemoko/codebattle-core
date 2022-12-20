@@ -94,7 +94,9 @@ func GetContestById(c *gin.Context) {
 			Id:   contest.R.OwnerUser.ID,
 			Name: contest.R.OwnerUser.Name,
 		},
-		Name: contest.Name,
+		Name:          contest.Name,
+		RecentMatches: []Match{},
+		Ranking:       []Entry{},
 	}
 	if contest.Description.Valid {
 		res.Description = contest.Description.String

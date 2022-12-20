@@ -17,6 +17,8 @@ type Match struct {
 
 	Id string `json:"id"`
 
+	Type string `json:"type"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	Entries []MatchEntry `json:"entries"`

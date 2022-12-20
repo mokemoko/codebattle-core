@@ -69,6 +69,21 @@ paths:
           schema:
             type: string
             format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entryIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  minItems: 4
+                  maxItems: 4
+              required: [ entryIds ]
       responses:
         '200':
           description: ok
@@ -157,13 +172,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Entry'
-      required: [ id, owner, name ]
+      required: [ id, owner, name, recentMatches, ranking ]
     Match:
       type: object
       properties:
         id:
           type: string
           format: uuid
+        type:
+          type: string
+          enum:
+            - rated
+            - unrated
         createdAt:
           type: string
           format: date-time
@@ -173,7 +193,7 @@ components:
             $ref: '#/components/schemas/MatchEntry'
           minItems: 2
           maxItems: 4
-      required: [ id, entries ]
+      required: [ id, type, entries ]
     MatchEntry:
       type: object
       allOf:

@@ -20,7 +20,9 @@
     </Row>
     <Row>
       <Col xs="8">
-        <Pickup match={$contestState.recentMatches[0]}/>
+        {#if $contestState.recentMatches.length > 0}
+          <Pickup match={$contestState.recentMatches[0]}/>
+        {/if}
         <LeaderBoard entries={$contestState.ranking}/>
       </Col>
       <Col xs="4">

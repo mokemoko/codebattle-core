@@ -9,17 +9,7 @@
 
 package openapi
 
-type Contest struct {
+type PutMatchRequest struct {
 
-	Id string `json:"id"`
-
-	Owner User `json:"owner"`
-
-	Name string `json:"name"`
-
-	Description string `json:"description,omitempty"`
-
-	RecentMatches []Match `json:"recentMatches"`
-
-	Ranking []Entry `json:"ranking"`
+	EntryIds []string `json:"entryIds"`
 }

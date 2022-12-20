@@ -66,6 +66,12 @@ paths:
           format: uuid
           type: string
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/putMatch_request'
+        required: true
       responses:
         "200":
           content:
@@ -163,6 +169,7 @@ components:
           - null
           - null
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: rated
         - createdAt: 2000-01-23T04:56:07.000+00:00
           entries:
           - null
@@ -170,6 +177,7 @@ components:
           - null
           - null
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: rated
         ranking:
         - score: 800
           name: bot example
@@ -215,6 +223,8 @@ components:
       - id
       - name
       - owner
+      - ranking
+      - recentMatches
       type: object
     Match:
       example:
@@ -225,9 +235,15 @@ components:
         - null
         - null
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: rated
       properties:
         id:
           format: uuid
+          type: string
+        type:
+          enum:
+          - rated
+          - unrated
           type: string
         createdAt:
           format: date-time
@@ -241,6 +257,7 @@ components:
       required:
       - entries
       - id
+      - type
       type: object
     MatchEntry:
       allOf:
@@ -327,6 +344,18 @@ components:
       required:
       - id
       - name
+      type: object
+    putMatch_request:
+      properties:
+        entryIds:
+          items:
+            format: uuid
+            type: string
+          maxItems: 4
+          minItems: 4
+          type: array
+      required:
+      - entryIds
       type: object
     MatchEntry_allOf:
       properties:
