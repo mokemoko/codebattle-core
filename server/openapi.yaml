@@ -184,6 +184,12 @@ components:
           enum:
             - rated
             - unrated
+        status:
+          type: string
+          enum:
+            - requested
+            - ongoing
+            - finished
         createdAt:
           type: string
           format: date-time
@@ -193,7 +199,7 @@ components:
             $ref: '#/components/schemas/MatchEntry'
           minItems: 2
           maxItems: 4
-      required: [ id, type, entries ]
+      required: [ id, type, status, entries ]
     MatchEntry:
       type: object
       allOf:

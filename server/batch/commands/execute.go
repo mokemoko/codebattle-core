@@ -122,7 +122,7 @@ func saveMatch(matchEntries []*models.Match) error {
 
 	for _, matchEntry := range matchEntries {
 		// TODO: 正規化
-		matchEntry.Status = 1
+		matchEntry.Status = models.MatchStatusFinished.Code
 		_, err = matchEntry.Update(context.Background(), tx, boil.Infer())
 		if err != nil {
 			_ = tx.Rollback()
@@ -141,7 +141,7 @@ func saveMatch(matchEntries []*models.Match) error {
 
 func RunExecute() {
 	matchList, err := models.Matches(
-		models.MatchWhere.Status.EQ(0),
+		models.MatchWhere.Status.EQ(models.MatchStatusRequested.Code),
 		Distinct("id"),
 		Select("id"),
 	).AllG(context.Background())
@@ -154,6 +154,7 @@ func RunExecute() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		// TODO: statusを更新
 		result, err := executeMatch(matchList)
 		if err != nil {
 			log.Fatal(err)

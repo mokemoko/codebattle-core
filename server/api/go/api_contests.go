@@ -131,6 +131,7 @@ func GetContestById(c *gin.Context) {
 			createdAt, _ := time.Parse("2006-01-02T15:04:05Z", match.CreatedAt)
 			tmpMatch.Id = match.ID
 			tmpMatch.Type = models.NewMatchType(match.Type).Name
+			tmpMatch.Status = models.NewMatchStatus(match.Status).Name
 			tmpMatch.CreatedAt = createdAt
 		} else if tmpMatch.Id != match.ID {
 			res.RecentMatches = append(res.RecentMatches, tmpMatch)
@@ -138,6 +139,7 @@ func GetContestById(c *gin.Context) {
 			tmpMatch = Match{
 				Id:        match.ID,
 				Type:      models.NewMatchType(match.Type).Name,
+				Status:    models.NewMatchStatus(match.Status).Name,
 				CreatedAt: createdAt,
 			}
 		}

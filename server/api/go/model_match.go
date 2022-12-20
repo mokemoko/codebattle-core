@@ -19,6 +19,8 @@ type Match struct {
 
 	Type string `json:"type"`
 
+	Status string `json:"status"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	Entries []MatchEntry `json:"entries"`

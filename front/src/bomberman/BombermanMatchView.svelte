@@ -4,6 +4,7 @@
   import { Button, Icon, InputGroup } from 'sveltestrap'
 
   export let matchId: string
+  export let playerNames: string[]
   export let showDetail = true
 
   let canvas: HTMLCanvasElement
@@ -44,7 +45,7 @@
   onMount(async () => {
     const log = await fetchLog(`logs/${matchId}.log`)
 
-    game = new Game(log, canvas)
+    game = new Game(log, canvas, playerNames)
 
     turn = 0
   })

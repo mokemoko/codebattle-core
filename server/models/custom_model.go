@@ -18,6 +18,22 @@ var (
 	EntryStatusDisabled   = NewEntryStatus(4)
 )
 
+type MatchStatus struct {
+	Code int64
+	Name string
+}
+
+func NewMatchStatus(code int64) MatchStatus {
+	name := []string{"requested", "ongoing", "finished"}[code]
+	return MatchStatus{Code: code, Name: name}
+}
+
+var (
+	MatchStatusRequested = NewMatchStatus(0)
+	MatchStatusOngoing   = NewMatchStatus(1)
+	MatchStatusFinished  = NewMatchStatus(2)
+)
+
 type MatchType struct {
 	Code int64
 	Name string

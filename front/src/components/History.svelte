@@ -6,12 +6,12 @@
   import RankLabel from './atoms/RankLabel.svelte'
   import BombermanMatchView from '../bomberman/BombermanMatchView.svelte'
   import MatchModal from './MatchModal.svelte'
-  import StatusBadge from "./atoms/StatusBadge.svelte";
+  import StatusBadge from './atoms/StatusBadge.svelte'
 
   export let matches: Match[]
 
   let isOpenMatchEntry = false
-  let selectedId = ''
+  let selectedMatch: Match | null
 </script>
 
 <h3>
@@ -28,7 +28,7 @@
           <Col>
             <div class="d-flex">
               <span class="flex-grow-1">{dayjs(match.createdAt).format('YYYY/MM/DD HH:mm:ss')}</span>
-              <StatusBadge status={match.type} />
+              <StatusBadge status={match.type}/>
             </div>
           </Col>
         </Row>
@@ -45,14 +45,16 @@
           </Col>
         </Row>
       </Container>
-      <a href="#{match.id}" on:click={() => selectedId = match.id} class="stretched-link"></a>
+      {#if match.status === "finished"}
+        <a class="stretched-link" href="#{match.id}" on:click={() => selectedMatch = match}></a>
+      {/if}
     </Card>
   </div>
 {/each}
 
-<Modal size="lg" isOpen={selectedId.length > 0} toggle={() => selectedId = ''}>
+<Modal size="lg" isOpen={selectedMatch} toggle={() => selectedMatch = null}>
   <ModalBody class="mx-auto">
-    <BombermanMatchView matchId={selectedId}/>
+    <BombermanMatchView matchId={selectedMatch.id} playerNames={selectedMatch.entries.map(e => e.name)}/>
   </ModalBody>
 </Modal>
 

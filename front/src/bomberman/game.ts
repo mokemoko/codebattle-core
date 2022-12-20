@@ -34,11 +34,20 @@ export class Game {
   ctx: CanvasRenderingContext2D
   turnMax: number
   turnInfo: TurnInfo[]
+  playerNames: string[]
 
-  constructor(log: string, canvas: HTMLCanvasElement) {
+  constructor(log: string, canvas: HTMLCanvasElement, playerNames: string[]) {
     this.ctx = canvas.getContext('2d')
+    this.ctx.font = '16px "Segoe Print"'
+    this.ctx.lineWidth = 4
+    this.ctx.textAlign = 'center'
+    this.ctx.fillStyle = '#fff'
+    this.ctx.strokeStyle = '#000'
+
     this.turnInfo = parseLog(log)
     this.turnMax = this.turnInfo.length - 1
+
+    this.playerNames = playerNames
   }
 
   draw(turn: number) {
@@ -82,6 +91,14 @@ export class Game {
     players.filter(p => !p[7]).forEach(p => {
       this.ctx.drawImage(charaSprite, CHARA_SIZE * 3 * p[0], CHARA_SIZE * (p[3] === 0 ? 1 : p[3] - 1), CHARA_SIZE, CHARA_SIZE,
         p[2] * DRAW_SIZE, p[1] * DRAW_SIZE, DRAW_SIZE, DRAW_SIZE)
+      if (this.playerNames) {
+        this.drawText(this.playerNames[p[0]], p[2], p[1])
+      }
     })
+  }
+
+  drawText(text: string, x: number, y: number) {
+    this.ctx.strokeText(text, (x + 0.5) * DRAW_SIZE, y * DRAW_SIZE)
+    this.ctx.fillText(text, (x + 0.5) * DRAW_SIZE, y * DRAW_SIZE)
   }
 }
