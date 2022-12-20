@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Form, FormGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap'
+  import { Button, Form, FormGroup, FormText, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap'
   import { get } from 'svelte/store'
   import { contestState } from '../domain/state'
   import type { Entry } from '../generated'
@@ -14,7 +14,7 @@
 
   const validate = () => {
     if (entryIds.length !== 4) {
-      throw Error('Choose exactly 4 entries.')
+      throw Error('AIを4つ選んでください')
     }
   }
 
@@ -37,13 +37,14 @@
   <ModalBody>
     <Form>
       <FormGroup>
-        <Label for="entrySelect">Select target entries.</Label>
+        <Label for="entrySelect">手動対戦を実行するAIを選んでください</Label>
         <!-- sveltestrap が multiple select に対応していない -->
         <select class="form-select" id="entrySelect" multiple size={Math.min(entries.length, 10)} bind:value={entryIds}>
           {#each entries as entry}
             <option value={entry.id}>{entry.name} | {entry.score} ({entry.user.name})</option>
           {/each}
         </select>
+        <FormText>※ 手動対戦によるレートの更新はありません</FormText>
       </FormGroup>
     </Form>
     {#if error.length > 0}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Form, FormGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap'
+  import { Button, Form, FormGroup, FormText, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap'
   import { registerEntry, updateEntry } from '../domain/usecase'
   import type { Entry } from '../generated'
 
@@ -40,9 +40,11 @@
       </FormGroup>
       <FormGroup floating label="Repository">
         <Input bind:value={repository}/>
+        <FormText>Dockerfileを直下に配置したリポジトリURLを入力してください。末尾にアンカーリンクでブランチ指定も可能です（#develop など）</FormText>
       </FormGroup>
       <FormGroup>
-        <Input type="checkbox" label="IsDisabled" bind:checked={isDisabled}/>
+        <Input type="checkbox" label="非活性" bind:checked={isDisabled}/>
+        <FormText>非活性状態のAIは対戦の対象とならず、ランキングにも表示されません</FormText>
       </FormGroup>
       {#if entry}
         <FormGroup floating label="Error">
