@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, Button, Card, Col, Container, Modal, ModalBody, Row, Table } from 'sveltestrap'
+  import { Button, Card, Col, Container, Modal, ModalBody, Row, Table } from 'sveltestrap'
   import dayjs from 'dayjs'
   import type { Match } from '../generated'
   import ScoreLabel from './atoms/ScoreLabel.svelte'
@@ -7,6 +7,7 @@
   import BombermanMatchView from '../bomberman/BombermanMatchView.svelte'
   import MatchModal from './MatchModal.svelte'
   import StatusBadge from './atoms/StatusBadge.svelte'
+  import { userState } from "../domain/state";
 
   export let matches: Match[]
 
@@ -16,7 +17,9 @@
 
 <h3>
   <span>Matching History</span>
-  <Button outline on:click={() => isOpenMatchEntry = true}>Battle</Button>
+  {#if $userState}
+    <Button outline on:click={() => isOpenMatchEntry = true}>Battle</Button>
+  {/if}
 </h3>
 
 {#each matches as match}

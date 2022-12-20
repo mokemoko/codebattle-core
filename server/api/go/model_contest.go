@@ -22,4 +22,6 @@ type Contest struct {
 	RecentMatches []Match `json:"recentMatches"`
 
 	Ranking []Entry `json:"ranking"`
+
+	OwnEntries []Entry `json:"ownEntries,omitempty"`
 }

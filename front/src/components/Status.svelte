@@ -2,8 +2,7 @@
   import { Button, Table } from 'sveltestrap'
   import type { Entry } from '../generated'
   import EntryModal from './EntryModal.svelte'
-  import { contestState, userState } from '../domain/state'
-  import { get } from 'svelte/store'
+  import { contestState } from '../domain/state'
   import StatusBadge from './atoms/StatusBadge.svelte'
   import ScoreLabel from './atoms/ScoreLabel.svelte'
 
@@ -12,8 +11,7 @@
   let isOpen = false
 
   contestState.subscribe(contest => {
-    const userId = get(userState).id
-    entries = contest.ranking.filter(entry => entry.user.id === userId)
+    entries = contest.ownEntries
   })
 
   const selectEntry = (entry: Entry | null) => {
@@ -53,7 +51,8 @@
 
 <!-- model -->
 <EntryModal isOpen={isOpen} entry={selectedEntry}
-            name={selectedEntry?.name || ''} repository={selectedEntry?.repository || ''} isDisabled={selectedEntry?.status === "disabled"}
+            name={selectedEntry?.name || ''} repository={selectedEntry?.repository || ''}
+            isDisabled={selectedEntry?.status === "disabled"}
             callback={() => isOpen = false}/>
 
 <style>

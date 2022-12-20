@@ -57,17 +57,14 @@ func GetContestById(c *gin.Context) {
 		return
 	}
 
-	// TODO: 自身のentryは別APIで取得するようにしてregisteredに絞る
-	entries, err := contest.Entries(
+	rankingEntries, err := contest.Entries(
+		models.EntryWhere.ContestID.EQ(contestId),
+		models.EntryWhere.Status.EQ(models.EntryStatusRegistered.Code),
 		OrderBy("score desc"),
 		Load("User"),
+		Limit(20),
 	).AllG(c.Request.Context())
-	if err == sql.ErrNoRows {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": err.Error(),
-		})
-		return
-	} else if err != nil {
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -79,12 +76,7 @@ func GetContestById(c *gin.Context) {
 		OrderBy("created_at desc"),
 		Limit(40),
 	).AllG(c.Request.Context())
-	if err == sql.ErrNoRows {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": err.Error(),
-		})
-		return
-	} else if err != nil {
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -105,7 +97,7 @@ func GetContestById(c *gin.Context) {
 		res.Description = contest.Description.String
 	}
 	users := map[string]User{}
-	for _, entry := range entries {
+	for _, entry := range rankingEntries {
 		users[entry.R.User.ID] = User{
 			Id:   entry.R.User.ID,
 			Name: entry.R.User.Name,
@@ -116,12 +108,6 @@ func GetContestById(c *gin.Context) {
 			Name:  entry.Name,
 			User:  users[entry.R.User.ID],
 			Score: int32(entry.Score),
-		}
-		// 自身のentryは追加情報返す
-		if entry.R.User.ID == userId {
-			e.Error = entry.Error.String
-			e.Status = models.NewEntryStatus(entry.Status).Name
-			e.Repository = entry.Repository
 		}
 		res.Ranking = append(res.Ranking, e)
 	}
@@ -154,6 +140,35 @@ func GetContestById(c *gin.Context) {
 	}
 	if tmpMatch.Id != "" {
 		res.RecentMatches = append(res.RecentMatches, tmpMatch)
+	}
+
+	if userId != "" {
+		// ログイン済みの場合は自身のエントリー情報を返す
+		res.OwnEntries = []Entry{}
+
+		ownEntries, err := contest.Entries(
+			models.EntryWhere.ContestID.EQ(contestId),
+			models.EntryWhere.UserID.EQ(userId),
+			OrderBy("created_at"),
+		).AllG(c.Request.Context())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		for _, entry := range ownEntries {
+			e := Entry{
+				Id:         entry.ID,
+				Name:       entry.Name,
+				Score:      int32(entry.Score),
+				Error:      entry.Error.String,
+				Status:     models.NewEntryStatus(entry.Status).Name,
+				Repository: entry.Repository,
+			}
+			res.OwnEntries = append(res.OwnEntries, e)
+		}
 	}
 
 	c.JSON(http.StatusOK, res)

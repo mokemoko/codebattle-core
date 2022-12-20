@@ -172,6 +172,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Entry'
+        ownEntries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entry'
       required: [ id, owner, name, recentMatches, ranking ]
     Match:
       type: object
