@@ -162,8 +162,7 @@ func updateMatchStatus(matchEntries []*models.Match, status models.MatchStatus) 
 func RunExecute() {
 	matchList, err := models.Matches(
 		models.MatchWhere.Status.EQ(models.MatchStatusRequested.Code),
-		Distinct("id"),
-		Select("id"),
+		Distinct("id, type"),
 	).AllG(context.Background())
 	if err != nil {
 		log.Fatal(err)
@@ -187,7 +186,9 @@ func RunExecute() {
 			}
 			continue
 		}
-		rateMatch(matchList)
+		if match.Type == models.MatchTypeRated.Code {
+			rateMatch(matchList)
+		}
 		err = saveMatch(matchList)
 		if err != nil {
 			log.Print(match.ID, err)
