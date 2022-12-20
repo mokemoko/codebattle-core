@@ -4,10 +4,15 @@
   export let status = ''
 
   $: color = {
+    // EntryStatus
+    'accepted': 'primary',
     'processing': 'secondary',
     'registered': 'success',
     'error': 'danger',
     'disabled': 'dark',
+    // MatchType
+    'rated': 'primary',
+    'unrated': 'secondary',
   }[status] || 'primary'
 </script>
 

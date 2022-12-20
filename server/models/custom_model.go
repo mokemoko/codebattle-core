@@ -17,3 +17,18 @@ var (
 	EntryStatusError      = NewEntryStatus(3)
 	EntryStatusDisabled   = NewEntryStatus(4)
 )
+
+type MatchType struct {
+	Code int64
+	Name string
+}
+
+func NewMatchType(code int64) MatchType {
+	name := []string{"rated", "unrated"}[code]
+	return MatchType{Code: code, Name: name}
+}
+
+var (
+	MatchTypeRated   = NewMatchType(0)
+	MatchTypeUnrated = NewMatchType(1)
+)

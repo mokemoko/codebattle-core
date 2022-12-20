@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { Button, Card, Col, Container, Modal, ModalBody, Row, Table } from 'sveltestrap'
+  import { Badge, Button, Card, Col, Container, Modal, ModalBody, Row, Table } from 'sveltestrap'
   import dayjs from 'dayjs'
   import type { Match } from '../generated'
   import ScoreLabel from './atoms/ScoreLabel.svelte'
   import RankLabel from './atoms/RankLabel.svelte'
   import BombermanMatchView from '../bomberman/BombermanMatchView.svelte'
   import MatchModal from './MatchModal.svelte'
+  import StatusBadge from "./atoms/StatusBadge.svelte";
 
   export let matches: Match[]
 
@@ -24,7 +25,12 @@
       <Container>
         <Row>
           <Col xs="2">Time</Col>
-          <Col>{dayjs(match.createdAt).format('YYYY/MM/DD HH:mm:ss')}</Col>
+          <Col>
+            <div class="d-flex">
+              <span class="flex-grow-1">{dayjs(match.createdAt).format('YYYY/MM/DD HH:mm:ss')}</span>
+              <StatusBadge status={match.type} />
+            </div>
+          </Col>
         </Row>
         <Row>
           <Col xs="2">Result</Col>
