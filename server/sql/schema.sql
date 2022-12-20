@@ -50,6 +50,8 @@ CREATE TABLE `match`
     id           VARCHAR(36) NOT NULL,
     entry_id     VARCHAR(36) NOT NULL,
     contest_id   VARCHAR(36) NOT NULL,
+    user_id      VARCHAR(36),
+    type         INT         NOT NULL DEFAULT 0,
     status       INT         NOT NULL DEFAULT 0,
     `rank`       INT         NOT NULL,
     before_score INT         NOT NULL,
@@ -58,5 +60,6 @@ CREATE TABLE `match`
     updated_at   TIMESTAMP   NOT NULL,
     PRIMARY KEY (id, entry_id),
     FOREIGN KEY (entry_id) REFERENCES entry (id),
-    FOREIGN KEY (contest_id) REFERENCES contest (id)
+    FOREIGN KEY (contest_id) REFERENCES contest (id),
+    FOREIGN KEY (user_id) REFERENCES user (id)
 );

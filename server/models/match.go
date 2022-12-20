@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,15 +24,17 @@ import (
 
 // Match is an object representing the database table.
 type Match struct {
-	ID          string `boil:"id" json:"id" toml:"id" yaml:"id"`
-	EntryID     string `boil:"entry_id" json:"entry_id" toml:"entry_id" yaml:"entry_id"`
-	ContestID   string `boil:"contest_id" json:"contest_id" toml:"contest_id" yaml:"contest_id"`
-	Status      int64  `boil:"status" json:"status" toml:"status" yaml:"status"`
-	Rank        int64  `boil:"rank" json:"rank" toml:"rank" yaml:"rank"`
-	BeforeScore int64  `boil:"before_score" json:"before_score" toml:"before_score" yaml:"before_score"`
-	AfterScore  int64  `boil:"after_score" json:"after_score" toml:"after_score" yaml:"after_score"`
-	CreatedAt   string `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt   string `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	EntryID     string      `boil:"entry_id" json:"entry_id" toml:"entry_id" yaml:"entry_id"`
+	ContestID   string      `boil:"contest_id" json:"contest_id" toml:"contest_id" yaml:"contest_id"`
+	UserID      null.String `boil:"user_id" json:"user_id,omitempty" toml:"user_id" yaml:"user_id,omitempty"`
+	Type        int64       `boil:"type" json:"type" toml:"type" yaml:"type"`
+	Status      int64       `boil:"status" json:"status" toml:"status" yaml:"status"`
+	Rank        int64       `boil:"rank" json:"rank" toml:"rank" yaml:"rank"`
+	BeforeScore int64       `boil:"before_score" json:"before_score" toml:"before_score" yaml:"before_score"`
+	AfterScore  int64       `boil:"after_score" json:"after_score" toml:"after_score" yaml:"after_score"`
+	CreatedAt   string      `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt   string      `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *matchR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L matchL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -41,6 +44,8 @@ var MatchColumns = struct {
 	ID          string
 	EntryID     string
 	ContestID   string
+	UserID      string
+	Type        string
 	Status      string
 	Rank        string
 	BeforeScore string
@@ -51,6 +56,8 @@ var MatchColumns = struct {
 	ID:          "id",
 	EntryID:     "entry_id",
 	ContestID:   "contest_id",
+	UserID:      "user_id",
+	Type:        "type",
 	Status:      "status",
 	Rank:        "rank",
 	BeforeScore: "before_score",
@@ -63,6 +70,8 @@ var MatchTableColumns = struct {
 	ID          string
 	EntryID     string
 	ContestID   string
+	UserID      string
+	Type        string
 	Status      string
 	Rank        string
 	BeforeScore string
@@ -73,6 +82,8 @@ var MatchTableColumns = struct {
 	ID:          "match.id",
 	EntryID:     "match.entry_id",
 	ContestID:   "match.contest_id",
+	UserID:      "match.user_id",
+	Type:        "match.type",
 	Status:      "match.status",
 	Rank:        "match.rank",
 	BeforeScore: "match.before_score",
@@ -87,6 +98,8 @@ var MatchWhere = struct {
 	ID          whereHelperstring
 	EntryID     whereHelperstring
 	ContestID   whereHelperstring
+	UserID      whereHelpernull_String
+	Type        whereHelperint64
 	Status      whereHelperint64
 	Rank        whereHelperint64
 	BeforeScore whereHelperint64
@@ -97,6 +110,8 @@ var MatchWhere = struct {
 	ID:          whereHelperstring{field: "\"match\".\"id\""},
 	EntryID:     whereHelperstring{field: "\"match\".\"entry_id\""},
 	ContestID:   whereHelperstring{field: "\"match\".\"contest_id\""},
+	UserID:      whereHelpernull_String{field: "\"match\".\"user_id\""},
+	Type:        whereHelperint64{field: "\"match\".\"type\""},
 	Status:      whereHelperint64{field: "\"match\".\"status\""},
 	Rank:        whereHelperint64{field: "\"match\".\"rank\""},
 	BeforeScore: whereHelperint64{field: "\"match\".\"before_score\""},
@@ -107,15 +122,18 @@ var MatchWhere = struct {
 
 // MatchRels is where relationship names are stored.
 var MatchRels = struct {
+	User    string
 	Contest string
 	Entry   string
 }{
+	User:    "User",
 	Contest: "Contest",
 	Entry:   "Entry",
 }
 
 // matchR is where relationships are stored.
 type matchR struct {
+	User    *User    `boil:"User" json:"User" toml:"User" yaml:"User"`
 	Contest *Contest `boil:"Contest" json:"Contest" toml:"Contest" yaml:"Contest"`
 	Entry   *Entry   `boil:"Entry" json:"Entry" toml:"Entry" yaml:"Entry"`
 }
@@ -123,6 +141,13 @@ type matchR struct {
 // NewStruct creates a new relationship struct
 func (*matchR) NewStruct() *matchR {
 	return &matchR{}
+}
+
+func (r *matchR) GetUser() *User {
+	if r == nil {
+		return nil
+	}
+	return r.User
 }
 
 func (r *matchR) GetContest() *Contest {
@@ -143,9 +168,9 @@ func (r *matchR) GetEntry() *Entry {
 type matchL struct{}
 
 var (
-	matchAllColumns            = []string{"id", "entry_id", "contest_id", "status", "rank", "before_score", "after_score", "created_at", "updated_at"}
+	matchAllColumns            = []string{"id", "entry_id", "contest_id", "user_id", "type", "status", "rank", "before_score", "after_score", "created_at", "updated_at"}
 	matchColumnsWithoutDefault = []string{"id", "entry_id", "contest_id", "rank", "before_score", "after_score", "created_at", "updated_at"}
-	matchColumnsWithDefault    = []string{"status"}
+	matchColumnsWithDefault    = []string{"user_id", "type", "status"}
 	matchPrimaryKeyColumns     = []string{"id", "entry_id"}
 	matchGeneratedColumns      = []string{}
 )
@@ -448,6 +473,17 @@ func (q matchQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool
 	return count > 0, nil
 }
 
+// User pointed to by the foreign key.
+func (o *Match) User(mods ...qm.QueryMod) userQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.UserID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Users(queryMods...)
+}
+
 // Contest pointed to by the foreign key.
 func (o *Match) Contest(mods ...qm.QueryMod) contestQuery {
 	queryMods := []qm.QueryMod{
@@ -468,6 +504,130 @@ func (o *Match) Entry(mods ...qm.QueryMod) entryQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Entries(queryMods...)
+}
+
+// LoadUser allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (matchL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeMatch interface{}, mods queries.Applicator) error {
+	var slice []*Match
+	var object *Match
+
+	if singular {
+		var ok bool
+		object, ok = maybeMatch.(*Match)
+		if !ok {
+			object = new(Match)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeMatch)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeMatch))
+			}
+		}
+	} else {
+		s, ok := maybeMatch.(*[]*Match)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeMatch)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeMatch))
+			}
+		}
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &matchR{}
+		}
+		if !queries.IsNil(object.UserID) {
+			args = append(args, object.UserID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &matchR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.UserID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.UserID) {
+				args = append(args, obj.UserID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`user`),
+		qm.WhereIn(`user.id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load User")
+	}
+
+	var resultSlice []*User
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice User")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for user")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user")
+	}
+
+	if len(matchAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.User = foreign
+		if foreign.R == nil {
+			foreign.R = &userR{}
+		}
+		foreign.R.Matches = append(foreign.R.Matches, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.UserID, foreign.ID) {
+				local.R.User = foreign
+				if foreign.R == nil {
+					foreign.R = &userR{}
+				}
+				foreign.R.Matches = append(foreign.R.Matches, local)
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadContest allows an eager lookup of values, cached into the
@@ -707,6 +867,102 @@ func (matchL) LoadEntry(ctx context.Context, e boil.ContextExecutor, singular bo
 		}
 	}
 
+	return nil
+}
+
+// SetUserG of the match to the related item.
+// Sets o.R.User to related.
+// Adds o to related.R.Matches.
+// Uses the global database handle.
+func (o *Match) SetUserG(ctx context.Context, insert bool, related *User) error {
+	return o.SetUser(ctx, boil.GetContextDB(), insert, related)
+}
+
+// SetUser of the match to the related item.
+// Sets o.R.User to related.
+// Adds o to related.R.Matches.
+func (o *Match) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"match\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 0, []string{"user_id"}),
+		strmangle.WhereClause("\"", "\"", 0, matchPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID, o.EntryID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.UserID, related.ID)
+	if o.R == nil {
+		o.R = &matchR{
+			User: related,
+		}
+	} else {
+		o.R.User = related
+	}
+
+	if related.R == nil {
+		related.R = &userR{
+			Matches: MatchSlice{o},
+		}
+	} else {
+		related.R.Matches = append(related.R.Matches, o)
+	}
+
+	return nil
+}
+
+// RemoveUserG relationship.
+// Sets o.R.User to nil.
+// Removes o from all passed in related items' relationships struct.
+// Uses the global database handle.
+func (o *Match) RemoveUserG(ctx context.Context, related *User) error {
+	return o.RemoveUser(ctx, boil.GetContextDB(), related)
+}
+
+// RemoveUser relationship.
+// Sets o.R.User to nil.
+// Removes o from all passed in related items' relationships struct.
+func (o *Match) RemoveUser(ctx context.Context, exec boil.ContextExecutor, related *User) error {
+	var err error
+
+	queries.SetScanner(&o.UserID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("user_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.User = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.Matches {
+		if queries.Equal(o.UserID, ri.UserID) {
+			continue
+		}
+
+		ln := len(related.R.Matches)
+		if ln > 1 && i < ln-1 {
+			related.R.Matches[i] = related.R.Matches[ln-1]
+		}
+		related.R.Matches = related.R.Matches[:ln-1]
+		break
+	}
 	return nil
 }
 
