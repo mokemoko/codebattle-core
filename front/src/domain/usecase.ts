@@ -30,3 +30,11 @@ export async function updateEntry(id: string, name: string, repository: string, 
   const updated = await contestClient.getContestById({ contestId })
   contestState.set(updated)
 }
+
+export async function requestMatch(entryIds: string[]) {
+  const contestId = get(contestState).id
+  await contestClient.putMatch({ contestId, putMatchRequest: { entryIds } })
+
+  const updated = await contestClient.getContestById({ contestId })
+  contestState.set(updated)
+}

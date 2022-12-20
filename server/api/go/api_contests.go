@@ -11,6 +11,9 @@ package openapi
 
 import (
 	"database/sql"
+	"github.com/google/uuid"
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"net/http"
 	"time"
 
@@ -74,7 +77,7 @@ func GetContestById(c *gin.Context) {
 	matches, err := contest.Matches(
 		Load("Entry"),
 		OrderBy("created_at desc"),
-		Limit(20),
+		Limit(40),
 	).AllG(c.Request.Context())
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -172,5 +175,52 @@ func GetContests(c *gin.Context) {
 
 // PutMatch -
 func PutMatch(c *gin.Context) {
+	userId := getUserIdFromJWT(c)
+	contestId := c.Param("contestId")
+
+	var json PutMatchRequest
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	matchId := uuid.NewString()
+	tx, err := boil.GetDB().(*sql.DB).Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	for _, entryId := range json.EntryIds {
+		entry, err := models.Entries(
+			models.EntryWhere.ID.EQ(entryId),
+		).OneG(c.Request.Context())
+		if err != nil {
+			// ErrNoRows含めて500として処理
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		match := models.Match{
+			ID:        matchId,
+			EntryID:   entryId,
+			ContestID: contestId,
+			UserID:    null.StringFrom(userId),
+			// 手動登録されたものはUnratedとする
+			Type:        models.MatchTypeUnrated.Code,
+			BeforeScore: entry.Score,
+			AfterScore:  entry.Score,
+		}
+		if err = match.Insert(c.Request.Context(), tx, boil.Infer()); err != nil {
+			_ = tx.Rollback()
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{})
 }

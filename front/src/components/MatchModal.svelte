@@ -3,6 +3,7 @@
   import { get } from 'svelte/store'
   import { contestState } from '../domain/state'
   import type { Entry } from '../generated'
+  import { requestMatch } from '../domain/usecase'
 
   export let isOpen: boolean
   export let callback: () => {}
@@ -18,14 +19,14 @@
   }
 
   const onSubmit = async () => {
-    console.log(entryIds)
     try {
       validate()
-      // TBA register match
+      await requestMatch(entryIds)
     } catch (e) {
       error = e.message
       return
     }
+    entryIds = []
     error = ''
     callback()
   }
@@ -40,7 +41,7 @@
         <!-- sveltestrap が multiple select に対応していない -->
         <select class="form-select" id="entrySelect" multiple size={Math.min(entries.length, 10)} bind:value={entryIds}>
           {#each entries as entry}
-            <option value={entry.id}>{entry.name} ({entry.user.name})</option>
+            <option value={entry.id}>{entry.name} | {entry.score} ({entry.user.name})</option>
           {/each}
         </select>
       </FormGroup>
