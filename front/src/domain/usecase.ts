@@ -15,17 +15,17 @@ export async function loadData() {
   contestState.set(contest)
 }
 
-export async function registerEntry(name: string, repository: string) {
+export async function registerEntry(name: string, repository: string, isDisabled: boolean) {
   const contestId = get(contestState).id
-  await entryClient.postEntry({ entryRequest: { contestId, name, repository } })
+  await entryClient.postEntry({ entryRequest: { contestId, name, repository, isDisabled } })
 
   const updated = await contestClient.getContestById({ contestId })
   contestState.set(updated)
 }
 
-export async function updateEntry(id: string, name: string, repository: string) {
+export async function updateEntry(id: string, name: string, repository: string, isDisabled: boolean) {
   const contestId = get(contestState).id
-  await entryClient.putEntry({ entryId: id, entryRequest: { contestId, name, repository } })
+  await entryClient.putEntry({ entryId: id, entryRequest: { contestId, name, repository, isDisabled } })
 
   const updated = await contestClient.getContestById({ contestId })
   contestState.set(updated)

@@ -16,4 +16,6 @@ type EntryRequest struct {
 	Name string `json:"name"`
 
 	Repository string `json:"repository"`
+
+	IsDisabled bool `json:"isDisabled,omitempty"`
 }

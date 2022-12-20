@@ -314,6 +314,7 @@ components:
       example:
         contestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         name: bot example
+        isDisabled: true
         repository: http://example.com/aeiou
       properties:
         contestId:
@@ -326,6 +327,8 @@ components:
         repository:
           format: url
           type: string
+        isDisabled:
+          type: boolean
       required:
       - contestId
       - name

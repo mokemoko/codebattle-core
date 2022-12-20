@@ -9,15 +9,16 @@
 
   export let name = ''
   export let repository = ''
+  export let isDisabled = false
 
   let error = ''
 
   const onSubmit = async () => {
     try {
       if (entry) {
-        await updateEntry(entry.id, name, repository)
+        await updateEntry(entry.id, name, repository, isDisabled)
       } else {
-        await registerEntry(name, repository)
+        await registerEntry(name, repository, isDisabled)
       }
     } catch (e) {
       error = e.message
@@ -39,6 +40,9 @@
       </FormGroup>
       <FormGroup floating label="Repository">
         <Input bind:value={repository}/>
+      </FormGroup>
+      <FormGroup>
+        <Input type="checkbox" label="IsDisabled" bind:checked={isDisabled}/>
       </FormGroup>
       {#if entry}
         <FormGroup floating label="Error">

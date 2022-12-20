@@ -53,7 +53,7 @@
 
 <!-- model -->
 <EntryModal isOpen={isOpen} entry={selectedEntry}
-            name={selectedEntry?.name || ''} repository={selectedEntry?.repository || ''}
+            name={selectedEntry?.name || ''} repository={selectedEntry?.repository || ''} isDisabled={selectedEntry?.status === "disabled"}
             callback={() => isOpen = false}/>
 
 <style>

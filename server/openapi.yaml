@@ -254,6 +254,8 @@ components:
         repository:
           type: string
           format: url
+        isDisabled:
+          type: boolean
       required: [ contestId, name, repository ]
 
   securitySchemes:

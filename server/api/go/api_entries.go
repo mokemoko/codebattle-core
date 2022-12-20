@@ -39,6 +39,9 @@ func PostEntry(c *gin.Context) {
 		Repository: json.Repository,
 		Score:      1500,
 	}
+	if json.IsDisabled {
+		entry.Status = models.EntryStatusDisabled.Code
+	}
 	if err := entry.InsertG(c.Request.Context(), boil.Infer()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -74,6 +77,9 @@ func PutEntry(c *gin.Context) {
 	entry.Repository = json.Repository
 	entry.Status = 0
 	entry.Error = null.String{}
+	if json.IsDisabled {
+		entry.Status = models.EntryStatusDisabled.Code
+	}
 
 	if _, err := entry.UpdateG(c.Request.Context(), boil.Infer()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
