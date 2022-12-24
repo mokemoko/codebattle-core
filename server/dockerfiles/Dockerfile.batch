@@ -1,0 +1,18 @@
+FROM golang:1.19-alpine AS build
+WORKDIR /go/src
+
+COPY batch .
+COPY models ../models
+
+# cgo required for go-sqlite3
+ARG CGO_ENABLED=1
+ARG GOOS=linux
+ARG GOARCH=amd64
+
+RUN apk add --no-cache build-base
+RUN go build -o batch .
+
+FROM docker:20.10.22-dind-alpine3.17 as runner
+WORKDIR /app
+COPY --from=build /go/src/batch ./
+ENTRYPOINT ["./batch"]

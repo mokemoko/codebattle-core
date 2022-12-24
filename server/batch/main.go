@@ -48,7 +48,6 @@ func main() {
 	case "matchmake":
 		commands.RunMatchMake(args.ContestId)
 	case "execute":
-		// TODO: dequeue match
 		commands.RunExecute()
 	default:
 		log.Fatalf("Invalid command: %s", args.Command)
