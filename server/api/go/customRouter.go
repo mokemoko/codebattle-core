@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"fmt"
 	"github.com/mokemoko/codebattle-core/server/models"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -26,6 +27,12 @@ var authMiddleware *jwt.GinJWTMiddleware
 func setup() {
 	gothic.GetProviderName = func(req *http.Request) (string, error) {
 		return "github", nil
+	}
+	if host := os.Getenv("GITHUB_HOST"); host != "" {
+		github.AuthURL = fmt.Sprintf("https://%s/login/oauth/authorize", host)
+		github.TokenURL = fmt.Sprintf("https://%s/login/oauth/access_token", host)
+		github.ProfileURL = fmt.Sprintf("https://%s/api/v3/user", host)
+		github.EmailURL = fmt.Sprintf("https://%s/api/v3/user/emails", host)
 	}
 	goth.UseProviders(github.New(
 		os.Getenv("GITHUB_CLIENT_KEY"),
