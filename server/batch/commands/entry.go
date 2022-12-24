@@ -18,6 +18,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 func genRepoHash(entry *models.Entry) string {
@@ -107,7 +108,7 @@ func applyError(entry *models.Entry, err error) error {
 	return updateEntry(entry)
 }
 
-func RunEntry() {
+func entry() {
 	count := 0
 	for {
 		entry, err := getEntry()
@@ -120,20 +121,20 @@ func RunEntry() {
 		count += 1
 		err = pullRepo(entry)
 		if err != nil {
-			log.Print(err)
+			log.Print(entry.ID, err)
 			err = applyError(entry, err)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal(entry.ID, err)
 			} else {
 				continue
 			}
 		}
 		err = buildImage(entry)
 		if err != nil {
-			log.Print(err)
+			log.Print(entry.ID, err)
 			err = applyError(entry, err)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal(entry.ID, err)
 			} else {
 				continue
 			}
@@ -145,7 +146,16 @@ func RunEntry() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Printf("%s %s entry success.", entry.ID, entry.Name)
 	}
+}
 
-	log.Printf("Execute %d entries.", count)
+func RunEntry(isDaemon bool) {
+	for {
+		entry()
+		if !isDaemon {
+			break
+		}
+		time.Sleep(time.Second)
+	}
 }

@@ -14,6 +14,7 @@ import (
 	"math"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type ExecuteParams struct {
@@ -159,7 +160,7 @@ func updateMatchStatus(matchEntries []*models.Match, status models.MatchStatus) 
 	return err
 }
 
-func RunExecute() {
+func execute() {
 	matchList, err := models.Matches(
 		models.MatchWhere.Status.EQ(models.MatchStatusRequested.Code),
 		Distinct("id, type"),
@@ -194,6 +195,16 @@ func RunExecute() {
 			log.Print(match.ID, err)
 			continue
 		}
-		log.Printf("%+v", result)
+		log.Printf("%s %+v", match.ID, result)
+	}
+}
+
+func RunExecute(isDaemon bool) {
+	for {
+		execute()
+		if !isDaemon {
+			break
+		}
+		time.Sleep(time.Second)
 	}
 }

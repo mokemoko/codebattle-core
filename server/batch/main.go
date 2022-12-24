@@ -13,8 +13,9 @@ import (
 
 type Args struct {
 	ContestId string
-	IsDebug   bool
 	Command   string
+	IsDebug   bool
+	IsDaemon  bool
 }
 
 type Result struct {
@@ -23,9 +24,10 @@ type Result struct {
 
 func parseArgs() Args {
 	args := Args{}
-	flag.BoolVar(&args.IsDebug, "debug", false, "")
 	flag.StringVar(&args.ContestId, "contestId", "", "")
 	flag.StringVar(&args.Command, "command", "execute", "choose in [entry, matchmake, execute]")
+	flag.BoolVar(&args.IsDebug, "debug", false, "")
+	flag.BoolVar(&args.IsDaemon, "daemon", false, "run as daemon mode")
 	flag.Parse()
 	return args
 }
@@ -44,11 +46,11 @@ func main() {
 
 	switch args.Command {
 	case "entry":
-		commands.RunEntry()
+		commands.RunEntry(args.IsDaemon)
 	case "matchmake":
 		commands.RunMatchMake(args.ContestId)
 	case "execute":
-		commands.RunExecute()
+		commands.RunExecute(args.IsDaemon)
 	default:
 		log.Fatalf("Invalid command: %s", args.Command)
 	}
