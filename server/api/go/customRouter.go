@@ -45,6 +45,7 @@ func setup() {
 		Key:        []byte(os.Getenv("SESSION_SECRET")),
 		SendCookie: true,
 		//SecureCookie: true,
+		CookieSameSite: http.SameSiteNoneMode,
 		CookieHTTPOnly: true,
 		Timeout:        time.Hour * 24 * 30, // one month
 		TokenLookup:    "cookie:jwt",

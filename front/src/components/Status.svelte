@@ -11,7 +11,7 @@
   let isOpen = false
 
   contestState.subscribe(contest => {
-    entries = contest.ownEntries
+    entries = contest.ownEntries || []
   })
 
   const selectEntry = (entry: Entry | null) => {
