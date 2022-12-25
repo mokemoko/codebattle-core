@@ -24,7 +24,7 @@
 
 {#each matches as match}
   <div class="body">
-    <Card>
+    <Card color={match.status === "finished" ? "" : "light"}>
       <Container>
         <Row>
           <Col xs="2">Time</Col>

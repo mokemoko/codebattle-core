@@ -25,6 +25,7 @@ function parseLog(log): TurnInfo[] {
     const map = [...Array(height)].map(() => lines.shift().split(''))
     const players = [...Array(parseInt(lines.shift()))].map(() => lines.shift().split(' ').map(v => parseInt(v)))
     const bombs = [...Array(parseInt(lines.shift()))].map(() => lines.shift().split(' ').map(v => parseInt(v)))
+    bombs.forEach(b => map[b[0]][b[1]] = '@')
     turnInfo.push({ map, players, bombs })
   }
   return turnInfo
@@ -54,34 +55,34 @@ export class Game {
     this.ctx.clearRect(0, 0, 720, 624)
     const { map, players, bombs } = this.turnInfo[turn]
     map.forEach((row, i) => row.map((cell, j) => {
-      let [sx, sy] = {
+      const [sx, sy] = {
         '#': [0, 0],
         '+': [IMAGE_SIZE, 0],
         '.': [IMAGE_SIZE * 2, 0],
         '*': [IMAGE_SIZE * 3, 0],
         '|': [IMAGE_SIZE * 4, 0],
         '-': [IMAGE_SIZE * 5, 0],
+        '@': [0, IMAGE_SIZE],
         'f': [IMAGE_SIZE, IMAGE_SIZE],
         'b': [IMAGE_SIZE * 2, IMAGE_SIZE],
       }[cell]
       this.ctx.drawImage(mapSprite, sx, sy, IMAGE_SIZE, IMAGE_SIZE,
         j * DRAW_SIZE, i * DRAW_SIZE, DRAW_SIZE, DRAW_SIZE)
     }))
+    // TODO: 爆発処理は初期化時に
     bombs.forEach(b => {
-      this.ctx.drawImage(mapSprite, 0, IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE,
-        b[1] * DRAW_SIZE, b[0] * DRAW_SIZE, DRAW_SIZE, DRAW_SIZE)
       if (b[4] === turn + 1 && turn + 1 <= this.turnMax) {
         const cmap = this.turnInfo[turn].map
         const nmap = this.turnInfo[turn + 1].map
         nmap[b[0]][b[1]] = '*'
         ;[[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(dp => {
           for (let f = 1; f <= b[3]; f++) {
-            if (cmap[b[0] + dp[0] * f][b[1] + dp[1] * f] === '#') {
+            const [y, x] = [b[0] + dp[0] * f, b[1] + dp[1] * f]
+            if (cmap[y][x] === '#') {
               break
             }
-            // TODO: 他の爆弾考慮
-            nmap[b[0] + dp[0] * f][b[1] + dp[1] * f] = dp[0] === 0 ? '-' : '|'
-            if (cmap[b[0] + dp[0] * f][b[1] + dp[1] * f] === '+') {
+            nmap[y][x] = dp[0] === 0 ? '-' : '|'
+            if (cmap[y][x] === '+' || cmap[y][x] === '@') {
               break
             }
           }
