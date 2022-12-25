@@ -1,10 +1,10 @@
 import { Configuration, ContestsApi, UsersApi, EntriesApi } from '../generated'
 
 // TODO: ref env
-const basePath = 'http://localhost:8081'
+export const apiBasePath = 'http://localhost:8081'
 
 const baseConf = new Configuration({
-  basePath,
+  basePath: apiBasePath,
   credentials: 'include',
 })
 

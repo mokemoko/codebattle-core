@@ -21,12 +21,14 @@ import (
 
 type Args struct {
 	Port    string
+	LogDir  string
 	IsDebug bool
 }
 
 func parseArgs() Args {
 	args := Args{}
 	flag.StringVar(&args.Port, "port", "8080", "")
+	flag.StringVar(&args.LogDir, "logDir", "./logs", "")
 	flag.BoolVar(&args.IsDebug, "debug", false, "")
 	flag.Parse()
 	return args
@@ -40,6 +42,7 @@ func main() {
 	}
 
 	router := sw.NewRouter()
+	router.Static("/logs", args.LogDir)
 
 	log.Printf("Server started")
 	log.Fatal(router.Run(fmt.Sprintf(":%s", args.Port)))

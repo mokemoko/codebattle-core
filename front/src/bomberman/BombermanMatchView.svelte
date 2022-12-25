@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { Game } from './game'
   import { Button, Icon, InputGroup } from 'sveltestrap'
+  import { apiBasePath } from '../domain/api'
 
   export let matchId: string
   export let playerNames: string[]
@@ -43,7 +44,7 @@
   }
 
   onMount(async () => {
-    const log = await fetchLog(`logs/${matchId}.log`)
+    const log = await fetchLog(`${apiBasePath}/logs/${matchId}.log`)
 
     game = new Game(log, canvas, playerNames)
 
