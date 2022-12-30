@@ -84,6 +84,7 @@ func buildImage(entry *models.Entry) error {
 	if err != nil {
 		return err
 	}
+	// TODO: ビルドエラーを検知できないケースの考慮
 	_, err = c.ImageBuild(context.Background(), buildCtx, types.ImageBuildOptions{
 		Tags:           []string{hash},
 		SuppressOutput: true,
