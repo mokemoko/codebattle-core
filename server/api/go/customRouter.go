@@ -68,7 +68,8 @@ func setup() {
 			return nil, jwt.ErrFailedAuthentication
 		},
 		LoginResponse: func(c *gin.Context, code int, message string, time time.Time) {
-			c.Redirect(http.StatusMovedPermanently, os.Getenv("FRONT_DOMAIN"))
+			redirectUrl := fmt.Sprintf("%s/%s", os.Getenv("FRONT_DOMAIN"), os.Getenv("REDIRECT_PATH"))
+			c.Redirect(http.StatusMovedPermanently, redirectUrl)
 		},
 	})
 	if err != nil {
