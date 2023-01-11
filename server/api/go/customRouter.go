@@ -41,10 +41,10 @@ func setup() {
 		"repo",
 	))
 	_authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:      "cdbt",
-		Key:        []byte(os.Getenv("SESSION_SECRET")),
-		SendCookie: true,
-		//SecureCookie: true,
+		Realm:          "cdbt",
+		Key:            []byte(os.Getenv("SESSION_SECRET")),
+		SendCookie:     true,
+		SecureCookie:   true, // turn false if local
 		CookieSameSite: http.SameSiteNoneMode,
 		CookieHTTPOnly: true,
 		Timeout:        time.Hour * 24 * 30, // one month
